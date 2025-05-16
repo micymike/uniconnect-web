@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Custom button hover effects */
+.button-hover {
+  transition: transform 0.2s ease-in-out;
+}
+
+.button-hover:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom gradient backgrounds */
+.bg-gradient-custom {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
