@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
 
 :root {
-  --accent: #ff6b6b;
-  --accent-hover: #ff5252;
-  --dark: #1a1a1a;
-  --darker: #2d2d2d;
+  --accent: #ff8c00;
+  --accent-hover: #e67e00;
+  --dark: #333333;
+  --darker: #1a1a1a;
   --foreground: 255, 255, 255;
 }
 
@@ -35,7 +35,7 @@ body {
 
 /* Custom gradient backgrounds */
 .bg-gradient-custom {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
 }
 
 /* Colors */
@@ -296,7 +296,7 @@ body {
 }
 
 .border-accent\/20 {
-  border-color: rgba(255, 107, 107, 0.2);
+  border-color: rgba(255, 140, 0, 0.2);
 }
 
 /* Shadows */
@@ -593,7 +593,7 @@ body {
 
 /* Opacity utilities */
 .bg-accent\/10 {
-  background-color: rgba(255, 107, 107, 0.1);
+  background-color: rgba(255, 140, 0, 0.1);
 }
 
 .text-white\/90 {

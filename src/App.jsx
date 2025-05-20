@@ -61,10 +61,10 @@ export default function App() {
       {/* Hero Section */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-4">
         <div className={`z-10 fade-in-up`}>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Welcome to <span className="text-accent">UnniConnect</span>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
+            Welcome to <span className="text-accent">UniConnect</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-white">
             Transforming campus life through affordable meal sharing, simplified rental searches, and a vibrant student
             marketplace.
           </p>
@@ -72,14 +72,14 @@ export default function App() {
             <button className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md">
               Download App
             </button>
-            <button className="border border-white text-white hover:bg-white/10 button-hover px-8 py-3 text-lg rounded-md">
+            <button className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md">
               Learn More ▼
             </button>
           </div>
         </div>
 
         <div className={`absolute inset-0 z-0 fade-in delay-500`} style={{
-          backgroundImage: "url('https://placehold.co/1920x1080')",
+          backgroundImage: "url('images/connect.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           opacity: 0.2
@@ -147,7 +147,7 @@ export default function App() {
           <div className={`text-center mb-16 ${isVisible.features ? 'fade-in-up' : 'invisible'}`}>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Our Solution</h2>
             <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
-              UnniConnect offers three integrated services to transform campus life
+              UniConnect offers three integrated services to transform campus life
             </p>
           </div>
 
@@ -156,13 +156,13 @@ export default function App() {
               <div className="bg-accent/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <span className="icon-utensils text-accent">🍽️</span>
               </div>
-              <h3 className="text-2xl font-bold mb-4">Meal Sharing Network</h3>
-              <p className="text-gray-300 mb-6">
+              <h3 className="text-2xl font-bold mb-4 text-white">Meal Sharing Network</h3>
+              <p className="text-white mb-6">
                 Connect with off-campus students offering affordable, home-cooked meals. Join meal pools or request
                 specific dishes at reduced costs.
               </p>
               <div className="mt-auto">
-                <button className="text-accent p-0 button-hover flex items-center">
+                <button className="bg-accent hover:bg-accent-hover p-2 button-hover flex items-center text-white rounded-md">
                   Learn more <span className="ml-2 icon-arrow">→</span>
                 </button>
               </div>
@@ -172,13 +172,13 @@ export default function App() {
               <div className="bg-accent/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <span className="icon-home text-accent">🏠</span>
               </div>
-              <h3 className="text-2xl font-bold mb-4">Rental Listings</h3>
-              <p className="text-gray-300 mb-6">
+              <h3 className="text-2xl font-bold mb-4 text-white">Rental Listings</h3>
+              <p className="text-white mb-6">
                 Find safe, affordable housing with our dedicated rental section. Search and filter properties based on
                 your needs and connect directly with landlords.
               </p>
               <div className="mt-auto">
-                <button className="text-accent p-0 button-hover flex items-center">
+                <button className="bg-accent hover:bg-accent-hover p-2 button-hover flex items-center text-white rounded-md">
                   Learn more <span className="ml-2 icon-arrow">→</span>
                 </button>
               </div>
@@ -188,13 +188,13 @@ export default function App() {
               <div className="bg-accent/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <span className="icon-shopping text-accent">🛍️</span>
               </div>
-              <h3 className="text-2xl font-bold mb-4">Student Marketplace</h3>
-              <p className="text-gray-300 mb-6">
+              <h3 className="text-2xl font-bold mb-4 text-white">Student Marketplace</h3>
+              <p className="text-white mb-6">
                 Buy, sell, or advertise items and services in our in-app marketplace. Foster a circular economy and
                 create income opportunities.
               </p>
               <div className="mt-auto">
-                <button className="text-accent p-0 button-hover flex items-center">
+                <button className="bg-accent hover:bg-accent-hover p-2 button-hover flex items-center text-white rounded-md">
                   Learn more <span className="ml-2 icon-arrow">→</span>
                 </button>
               </div>
@@ -207,9 +207,9 @@ export default function App() {
       <section ref={benefitsRef} className="py-20 px-4 bg-dark">
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 ${isVisible.benefits ? 'fade-in-up' : 'invisible'}`}>
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">What You'll Gain</h2>
-            <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
-              UnniConnect transforms campus life in multiple ways
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">What You'll Gain</h2>
+            <p className="text-lg md:text-xl max-w-3xl mx-auto text-white">
+              UniConnect transforms campus life in multiple ways
             </p>
           </div>
 
@@ -219,8 +219,8 @@ export default function App() {
                 <span className="text-accent font-bold">01</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Reduced Living Costs</h3>
-                <p className="text-gray-300">
+                <h3 className="text-xl font-bold mb-2 text-white">Reduced Living Costs</h3>
+                <p className="text-white">
                   Lower your daily expenses with access to affordable meals and cost-effective peer-to-peer
                   transactions.
                 </p>
@@ -232,8 +232,8 @@ export default function App() {
                 <span className="text-accent font-bold">02</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Income Generation</h3>
-                <p className="text-gray-300">
+                <h3 className="text-xl font-bold mb-2 text-white">Income Generation</h3>
+                <p className="text-white">
                   Earn money by selling meals, offering services, or selling goods through the platform.
                 </p>
               </div>
@@ -244,8 +244,8 @@ export default function App() {
                 <span className="text-accent font-bold">03</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Better Food Quality & Access</h3>
-                <p className="text-gray-300">
+                <h3 className="text-xl font-bold mb-2 text-white">Better Food Quality & Access</h3>
+                <p className="text-white">
                   Enjoy improved quality, variety, and accessibility of food options on campus.
                 </p>
               </div>
@@ -256,8 +256,8 @@ export default function App() {
                 <span className="text-accent font-bold">04</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Simplified Housing Search</h3>
-                <p className="text-gray-300">
+                <h3 className="text-xl font-bold mb-2 text-white">Simplified Housing Search</h3>
+                <p className="text-white">
                   Find suitable and affordable off-campus accommodation with ease, connecting with legitimate landlords.
                 </p>
               </div>
@@ -268,8 +268,8 @@ export default function App() {
                 <span className="text-accent font-bold">05</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Enhanced Community</h3>
-                <p className="text-gray-300">
+                <h3 className="text-xl font-bold mb-2 text-white">Enhanced Community</h3>
+                <p className="text-white">
                   Foster a stronger sense of community and collaboration among students through shared resources.
                 </p>
               </div>
@@ -280,8 +280,8 @@ export default function App() {
                 <span className="text-accent font-bold">06</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Vibrant Campus Economy</h3>
-                <p className="text-gray-300">
+                <h3 className="text-xl font-bold mb-2 text-white">Vibrant Campus Economy</h3>
+                <p className="text-white">
                   Participate in a thriving intra-campus economy through the student marketplace.
                 </p>
               </div>
@@ -295,8 +295,8 @@ export default function App() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className={`${isVisible.preview ? 'slide-in-left' : 'invisible'}`}>
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">Experience UnniConnect</h2>
-              <p className="text-lg text-gray-300 mb-8">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">Experience UniConnect</h2>
+              <p className="text-lg text-white mb-8">
                 Our intuitive mobile app brings all these features together in one seamless experience. Download now and
                 transform your campus life.
               </p>
@@ -314,8 +314,8 @@ export default function App() {
               <div className="absolute transform rotate-[-8deg] left-[calc(50%-130px)]">
                 <div className="relative w-[250px] h-[500px] rounded-[36px] overflow-hidden border-8 border-darker shadow-xl">
                   <img
-                    src="https://placehold.co/400x800"
-                    alt="UnniConnect App Screenshot - Meal Sharing"
+                    src="images/connect.jpg"
+                    alt="UniConnect App Screenshot - Meal Sharing"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -323,8 +323,8 @@ export default function App() {
               <div className="absolute transform rotate-[8deg] left-[calc(50%-20px)] top-10">
                 <div className="relative w-[250px] h-[500px] rounded-[36px] overflow-hidden border-8 border-darker shadow-xl">
                   <img
-                    src="https://placehold.co/400x800"
-                    alt="UnniConnect App Screenshot - Marketplace"
+                    src="images/connect.jpg"
+                    alt="UniConnect App Screenshot - Marketplace"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -342,10 +342,10 @@ export default function App() {
               Ready to Transform Your Campus Experience?
             </h2>
             <p className="text-xl text-white/90 mb-8">
-              Join thousands of students already benefiting from UnniConnect's innovative platform.
+              Join thousands of students already benefiting from UniConnect's innovative platform.
             </p>
             <button className="bg-white text-accent hover:bg-white/90 button-hover px-8 py-3 text-lg rounded-md">
-              Download UnniConnect Now
+              Download UniConnect Now
             </button>
           </div>
         </div>
@@ -361,25 +361,25 @@ export default function App() {
               </h3>
             </div>
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-white hover:text-accent transition-colors">
                 About
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-white hover:text-accent transition-colors">
                 Features
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-white hover:text-accent transition-colors">
                 Privacy
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-white hover:text-accent transition-colors">
                 Terms
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-white hover:text-accent transition-colors">
                 Contact
               </a>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-darker text-center text-gray-400">
-            <p>© {new Date().getFullYear()} UnniConnect. All rights reserved.</p>
+          <div className="mt-8 pt-8 border-t border-darker text-center text-white">
+            <p>© {new Date().getFullYear()} UniConnect. All rights reserved.</p>
           </div>
         </div>
       </footer>
