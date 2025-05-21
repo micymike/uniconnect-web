@@ -1,9 +1,14 @@
-"use client"
-
 import React, { useEffect, useRef, useState } from "react"
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import "./App.css"
 
-export default function App() {
+// Import pages
+import About from "./pages/About"
+import Contact from "./pages/Contact"
+import Terms from "./pages/Terms"
+
+// Home page component
+function Home() {
   const [isVisible, setIsVisible] = useState({
     hero: true,
     problem: false,
@@ -12,12 +17,19 @@ export default function App() {
     preview: false,
     cta: false
   })
-
+  
   const problemRef = useRef(null)
   const featuresRef = useRef(null)
   const benefitsRef = useRef(null)
   const previewRef = useRef(null)
   const ctaRef = useRef(null)
+  // Track parallax offset for different speeds
+  const [parallaxOffset, setParallaxOffset] = useState({
+    slow: 0,
+    medium: 0,
+    fast: 0,
+    opacity: 0.1
+  })
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -46,6 +58,33 @@ export default function App() {
     if (benefitsRef.current) observer.observe(benefitsRef.current)
     if (previewRef.current) observer.observe(previewRef.current)
     if (ctaRef.current) observer.observe(ctaRef.current)
+    
+    // Add parallax scrolling effect with fade out
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      
+      // Calculate background opacity - fade out completely after 300px of scroll
+      const bgOpacity = Math.max(0, 0.1 - (scrollY / 300) * 0.1)
+      
+      // Log for debugging
+      console.log("Scroll position:", scrollY, "Opacity:", bgOpacity)
+      
+      // Update parallax offsets
+      setParallaxOffset({
+        slow: scrollY * 0.05,
+        medium: scrollY * 0.1,
+        fast: scrollY * -0.15,
+        opacity: bgOpacity
+      })
+      
+      // Apply parallax effects via CSS variables
+      document.documentElement.style.setProperty('--parallax-slow', `${scrollY * 0.05}px`)
+      document.documentElement.style.setProperty('--parallax-medium', `${scrollY * 0.1}px`)
+      document.documentElement.style.setProperty('--parallax-fast', `${scrollY * -0.15}px`)
+    }
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll)
 
     return () => {
       if (problemRef.current) observer.unobserve(problemRef.current)
@@ -53,14 +92,38 @@ export default function App() {
       if (benefitsRef.current) observer.unobserve(benefitsRef.current)
       if (previewRef.current) observer.unobserve(previewRef.current)
       if (ctaRef.current) observer.unobserve(ctaRef.current)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
   return (
     <div className="min-h-screen font-roboto bg-gradient-custom text-white">
+      {/* Navigation */}
+      <nav className="absolute top-0 left-0 right-0 z-50 py-4 px-4">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <Link to="/" className="text-2xl font-bold">
+            Uni<span className="text-accent">Connect</span>
+          </Link>
+          <div className="flex gap-6">
+            <Link to="/" className="text-white hover:text-accent transition-colors">
+              Home
+            </Link>
+            <Link to="/about" className="text-white hover:text-accent transition-colors">
+              About
+            </Link>
+            <Link to="/contact" className="text-white hover:text-accent transition-colors">
+              Contact
+            </Link>
+            <Link to="/terms" className="text-white hover:text-accent transition-colors">
+              Terms
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section className="relative h-screen flex flex-col items-center justify-center text-center px-4">
-        <div className={`z-10 fade-in-up`}>
+      <section className="relative h-screen flex flex-col items-center justify-center text-center px-4 parallax-section">
+        <div className={`z-10 fade-in-up parallax-element parallax-medium`}>
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
             Welcome to <span className="text-accent">UniConnect</span>
           </h1>
@@ -72,28 +135,30 @@ export default function App() {
             <button className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md">
               Download App
             </button>
-            <button className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md">
+            <button className="border border-accent text-accent hover:bg-accent/10 button-hover px-8 py-3 text-lg rounded-md">
               Learn More ▼
             </button>
           </div>
         </div>
 
-        <div className={`absolute inset-0 z-0 fade-in delay-500`} style={{
-          backgroundImage: "url('images/connect.jpg')",
+        <div className={`absolute inset-0 z-0 fade-in delay-500 parallax-element`} style={{
+          backgroundImage: "url('images/connect1.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.2
+          opacity: parallaxOffset.opacity,
+          transform: `translateY(${parallaxOffset.slow}px)`,
+          transition: "opacity 0.2s ease-out, transform 0.2s ease-out"
         }} />
 
-        <div className={`absolute bottom-10 fade-in-up delay-1000`}>
+        <div className={`absolute bottom-10 fade-in-up delay-1000 parallax-element parallax-fast`}>
           <div className="arrow-down">↓</div>
         </div>
       </section>
 
       {/* Problem Statement Section */}
-      <section ref={problemRef} className="py-20 px-4 bg-dark">
+      <section ref={problemRef} className="py-20 px-4 bg-gradient-to-br from-darker to-dark parallax-section">
         <div className="max-w-6xl mx-auto">
-          <div className={`text-center mb-16 ${isVisible.problem ? 'fade-in-up' : 'invisible'}`}>
+          <div className={`text-center mb-16 ${isVisible.problem ? 'fade-in-up parallax-element parallax-medium' : 'invisible'}`}>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">The Campus Challenge</h2>
             <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
               Students face significant challenges with high meal costs, housing difficulties, and limited peer-to-peer
@@ -102,37 +167,37 @@ export default function App() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-10">
-            <div className={`bg-darker p-8 rounded-xl ${isVisible.problem ? 'slide-in-left' : 'invisible'}`}>
+            <div className={`bg-darker p-8 rounded-xl ${isVisible.problem ? 'slide-in-left parallax-element parallax-slow' : 'invisible'}`}>
               <h3 className="text-2xl font-bold mb-4 text-accent">High Living Costs</h3>
               <ul className="space-y-3 text-gray-300">
                 <li className="flex items-start">
-                  <span className="mr-2 mt-1">•</span>
+                  <span className="mr-2 mt-1 text-accent">•</span>
                   <span>Campus meals can cost up to Ksh 250/= per day</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 mt-1">•</span>
+                  <span className="mr-2 mt-1 text-accent">•</span>
                   <span>Cooking restrictions in hostels limit affordable options</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 mt-1">•</span>
+                  <span className="mr-2 mt-1 text-accent">•</span>
                   <span>Finding affordable housing is time-consuming and challenging</span>
                 </li>
               </ul>
             </div>
 
-            <div className={`bg-darker p-8 rounded-xl ${isVisible.problem ? 'slide-in-right' : 'invisible'}`}>
+            <div className={`bg-darker p-8 rounded-xl ${isVisible.problem ? 'slide-in-right parallax-element parallax-fast' : 'invisible'}`}>
               <h3 className="text-2xl font-bold mb-4 text-accent">Untapped Opportunities</h3>
               <ul className="space-y-3 text-gray-300">
                 <li className="flex items-start">
-                  <span className="mr-2 mt-1">•</span>
+                  <span className="mr-2 mt-1 text-accent">•</span>
                   <span>Off-campus students can prepare meals for just Ksh 100/= per day</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 mt-1">•</span>
+                  <span className="mr-2 mt-1 text-accent">•</span>
                   <span>Students have items to sell but lack a dedicated marketplace</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 mt-1">•</span>
+                  <span className="mr-2 mt-1 text-accent">•</span>
                   <span>Potential for income generation through peer-to-peer services</span>
                 </li>
               </ul>
@@ -142,9 +207,11 @@ export default function App() {
       </section>
 
       {/* Features Section */}
-      <section ref={featuresRef} className="py-20 px-4">
+      <section ref={featuresRef} className="py-20 px-4 parallax-section" style={{
+        background: "linear-gradient(135deg, #333333 0%, #111111 100%)"
+      }}>
         <div className="max-w-6xl mx-auto">
-          <div className={`text-center mb-16 ${isVisible.features ? 'fade-in-up' : 'invisible'}`}>
+          <div className={`text-center mb-16 ${isVisible.features ? 'fade-in-up parallax-element parallax-medium' : 'invisible'}`}>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Our Solution</h2>
             <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
               UniConnect offers three integrated services to transform campus life
@@ -152,7 +219,7 @@ export default function App() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className={`bg-gradient-to-br from-darker to-dark p-8 rounded-xl hover:shadow-lg transition-all duration-300 border border-accent/20 ${isVisible.features ? 'fade-in-up delay-200' : 'invisible'}`}>
+            <div className={`bg-gradient-to-br from-darker to-dark p-8 rounded-xl hover:shadow-lg transition-all duration-300 border border-accent/20 ${isVisible.features ? 'fade-in-up delay-200 parallax-element parallax-slow' : 'invisible'}`}>
               <div className="bg-accent/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <span className="icon-utensils text-accent">🍽️</span>
               </div>
@@ -168,7 +235,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`bg-gradient-to-br from-darker to-dark p-8 rounded-xl hover:shadow-lg transition-all duration-300 border border-accent/20 ${isVisible.features ? 'fade-in-up delay-400' : 'invisible'}`}>
+            <div className={`bg-gradient-to-br from-darker to-dark p-8 rounded-xl hover:shadow-lg transition-all duration-300 border border-accent/20 ${isVisible.features ? 'fade-in-up delay-400 parallax-element parallax-medium' : 'invisible'}`}>
               <div className="bg-accent/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <span className="icon-home text-accent">🏠</span>
               </div>
@@ -184,7 +251,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`bg-gradient-to-br from-darker to-dark p-8 rounded-xl hover:shadow-lg transition-all duration-300 border border-accent/20 ${isVisible.features ? 'fade-in-up delay-600' : 'invisible'}`}>
+            <div className={`bg-gradient-to-br from-darker to-dark p-8 rounded-xl hover:shadow-lg transition-all duration-300 border border-accent/20 ${isVisible.features ? 'fade-in-up delay-600 parallax-element parallax-fast' : 'invisible'}`}>
               <div className="bg-accent/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                 <span className="icon-shopping text-accent">🛍️</span>
               </div>
@@ -204,9 +271,11 @@ export default function App() {
       </section>
 
       {/* Benefits Section */}
-      <section ref={benefitsRef} className="py-20 px-4 bg-dark">
+      <section ref={benefitsRef} className="py-20 px-4 parallax-section" style={{
+        background: "linear-gradient(135deg, #222222 0%, #111111 100%)"
+      }}>
         <div className="max-w-6xl mx-auto">
-          <div className={`text-center mb-16 ${isVisible.benefits ? 'fade-in-up' : 'invisible'}`}>
+          <div className={`text-center mb-16 ${isVisible.benefits ? 'fade-in-up parallax-element parallax-medium' : 'invisible'}`}>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">What You'll Gain</h2>
             <p className="text-lg md:text-xl max-w-3xl mx-auto text-white">
               UniConnect transforms campus life in multiple ways
@@ -214,7 +283,7 @@ export default function App() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-10">
-            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-100' : 'invisible'}`}>
+            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-100 parallax-element parallax-slow' : 'invisible'}`}>
               <div className="bg-accent/10 p-3 h-12 rounded-full flex items-center justify-center">
                 <span className="text-accent font-bold">01</span>
               </div>
@@ -227,7 +296,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-200' : 'invisible'}`}>
+            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-200 parallax-element parallax-medium' : 'invisible'}`}>
               <div className="bg-accent/10 p-3 h-12 rounded-full flex items-center justify-center">
                 <span className="text-accent font-bold">02</span>
               </div>
@@ -239,7 +308,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-300' : 'invisible'}`}>
+            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-300 parallax-element parallax-fast' : 'invisible'}`}>
               <div className="bg-accent/10 p-3 h-12 rounded-full flex items-center justify-center">
                 <span className="text-accent font-bold">03</span>
               </div>
@@ -251,7 +320,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-400' : 'invisible'}`}>
+            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-400 parallax-element parallax-slow' : 'invisible'}`}>
               <div className="bg-accent/10 p-3 h-12 rounded-full flex items-center justify-center">
                 <span className="text-accent font-bold">04</span>
               </div>
@@ -263,7 +332,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-500' : 'invisible'}`}>
+            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-500 parallax-element parallax-medium' : 'invisible'}`}>
               <div className="bg-accent/10 p-3 h-12 rounded-full flex items-center justify-center">
                 <span className="text-accent font-bold">05</span>
               </div>
@@ -275,7 +344,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-600' : 'invisible'}`}>
+            <div className={`flex gap-4 ${isVisible.benefits ? 'scale-in delay-600 parallax-element parallax-fast' : 'invisible'}`}>
               <div className="bg-accent/10 p-3 h-12 rounded-full flex items-center justify-center">
                 <span className="text-accent font-bold">06</span>
               </div>
@@ -291,10 +360,12 @@ export default function App() {
       </section>
 
       {/* App Preview Section */}
-      <section ref={previewRef} className="py-20 px-4">
+      <section ref={previewRef} className="py-20 px-4 parallax-section" style={{
+        background: "linear-gradient(135deg, #222222 0%, #111111 100%)"
+      }}>
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className={`${isVisible.preview ? 'slide-in-left' : 'invisible'}`}>
+            <div className={`${isVisible.preview ? 'slide-in-left parallax-element parallax-medium' : 'invisible'}`}>
               <h2 className="text-3xl md:text-5xl font-bold mb-6">Experience UniConnect</h2>
               <p className="text-lg text-white mb-8">
                 Our intuitive mobile app brings all these features together in one seamless experience. Download now and
@@ -310,8 +381,10 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`relative h-[600px] flex justify-center ${isVisible.preview ? 'fade-in-up delay-200' : 'invisible'}`}>
-              <div className="absolute transform rotate-[-8deg] left-[calc(50%-130px)]">
+            <div className={`relative h-[600px] flex justify-center ${isVisible.preview ? 'fade-in-up delay-200 parallax-element parallax-slow' : 'invisible'}`}>
+              <div className="absolute transform rotate-[-8deg] left-[calc(50%-130px)]" style={{
+                transition: "transform 0.5s ease-out"
+              }}>
                 <div className="relative w-[250px] h-[500px] rounded-[36px] overflow-hidden border-8 border-darker shadow-xl">
                   <img
                     src="images/connect.jpg"
@@ -320,7 +393,9 @@ export default function App() {
                   />
                 </div>
               </div>
-              <div className="absolute transform rotate-[8deg] left-[calc(50%-20px)] top-10">
+              <div className="absolute transform rotate-[8deg] left-[calc(50%-20px)] top-10 parallax-element parallax-fast" style={{
+                transition: "transform 0.5s ease-out"
+              }}>
                 <div className="relative w-[250px] h-[500px] rounded-[36px] overflow-hidden border-8 border-darker shadow-xl">
                   <img
                     src="images/connect.jpg"
@@ -335,9 +410,9 @@ export default function App() {
       </section>
 
       {/* CTA Section */}
-      <section ref={ctaRef} className="py-20 px-4 bg-accent">
+      <section ref={ctaRef} className="py-20 px-4 bg-accent parallax-section">
         <div className="max-w-4xl mx-auto text-center">
-          <div className={`${isVisible.cta ? 'fade-in-up' : 'invisible'}`}>
+          <div className={`${isVisible.cta ? 'fade-in-up parallax-element parallax-medium' : 'invisible'}`}>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
               Ready to Transform Your Campus Experience?
             </h2>
@@ -357,25 +432,22 @@ export default function App() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-6 md:mb-0">
               <h3 className="text-2xl font-bold">
-                Unni<span className="text-accent">Connect</span>
+                Uni<span className="text-accent">Connect</span>
               </h3>
             </div>
             <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-              <a href="#" className="text-white hover:text-accent transition-colors">
+              <Link to="/" className="text-white hover:text-accent transition-colors">
+                Home
+              </Link>
+              <Link to="/about" className="text-white hover:text-accent transition-colors">
                 About
-              </a>
-              <a href="#" className="text-white hover:text-accent transition-colors">
-                Features
-              </a>
-              <a href="#" className="text-white hover:text-accent transition-colors">
-                Privacy
-              </a>
-              <a href="#" className="text-white hover:text-accent transition-colors">
-                Terms
-              </a>
-              <a href="#" className="text-white hover:text-accent transition-colors">
+              </Link>
+              <Link to="/contact" className="text-white hover:text-accent transition-colors">
                 Contact
-              </a>
+              </Link>
+              <Link to="/terms" className="text-white hover:text-accent transition-colors">
+                Terms
+              </Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-darker text-center text-white">
@@ -384,5 +456,18 @@ export default function App() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
+      </Routes>
+    </Router>
   )
 }

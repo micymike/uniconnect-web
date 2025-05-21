@@ -1,2 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
+
+:root {
+  --parallax-slow: 0px;
+  --parallax-medium: 0px;
+  --parallax-fast: 0px;
+}
+
+.parallax-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax-element {
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
