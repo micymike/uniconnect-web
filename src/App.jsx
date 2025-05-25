@@ -110,6 +110,7 @@ function HomePage() {
   
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const problemRef = useRef(null)
   const featuresRef = useRef(null)
@@ -227,7 +228,22 @@ function HomePage() {
             <span className="group-hover:animate-pulse text-white">Uni</span>
             <span className="text-accent group-hover:text-orange-400 transition-colors duration-300">Connect</span>
           </div>
-          <div className="flex gap-6">
+          
+          {/* Mobile Menu Button */}
+          <button className="md:hidden text-white focus:outline-none" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+          
+          {/* Desktop Menu */}
+          <div className="hidden md:flex gap-6">
             {[
               { text: "Home", path: "/" },
               { text: "About", path: "/about" },
@@ -247,6 +263,28 @@ function HomePage() {
             ))}
           </div>
         </div>
+        
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-black/90 backdrop-blur-lg mt-2 py-4 px-4 rounded-lg border border-gray-800 animate-fade-in-down">
+            {[
+              { text: "Home", path: "/" },
+              { text: "About", path: "/about" },
+              { text: "Contact", path: "/contact" },
+              { text: "Terms", path: "/terms" },
+              { text: "Privacy", path: "/privacy" },
+            ].map((link, index) => (
+              <Link 
+                to={link.path}
+                key={link.text}
+                className="block py-2 text-white hover:text-accent transition-all duration-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.text}
+              </Link>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* Hero Section with Advanced Effects */}
@@ -757,6 +795,17 @@ function HomePage() {
           to {
             opacity: 1;
             transform: scale(1);
+          }
+        }
+        
+        @keyframes fade-in-down {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
         

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
+import { Link } from "react-router-dom"
 
 // Advanced Floating Particles with Physics
 const AdvancedParticles = () => {
@@ -270,6 +271,7 @@ export default function About() {
   const statsRef = useRef(null)
   const timelineRef = useRef(null)
   const teamRef = useRef(null)
+   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -348,35 +350,72 @@ export default function About() {
         <div className="absolute inset-3 w-2 h-2 rounded-full bg-accent animate-ping" />
       </div>
 
-      {/* Revolutionary Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-4 backdrop-blur-xl bg-black/30 border-b border-orange-500/20">
+{/* Enhanced Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-4 backdrop-blur-lg bg-black/20 border-b border-white/10 transition-all duration-500">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="text-2xl font-bold group cursor-pointer transform hover:scale-105 transition-transform duration-300">
-            <span className="text-white group-hover:text-orange-300 transition-colors duration-300">Uni</span>
-            <span className="text-accent group-hover:animate-pulse">Connect</span>
+          <div className="text-2xl font-bold group cursor-pointer">
+            <span className="group-hover:animate-pulse text-white">Uni</span>
+            <span className="text-accent group-hover:text-orange-400 transition-colors duration-300">Connect</span>
           </div>
-          <div className="flex gap-8">
+          
+          {/* Mobile Menu Button */}
+          <button className="md:hidden text-white focus:outline-none" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+          
+          {/* Desktop Menu */}
+          <div className="hidden md:flex gap-6">
             {[
               { text: "Home", path: "/" },
               { text: "About", path: "/about" },
               { text: "Contact", path: "/contact" },
-              { text: "Terms", path: "/terms" }
+              { text: "Terms", path: "/terms" },
+              { text: "Privacy", path: "/privacy" },
             ].map((link, index) => (
-              <div 
+              <Link 
+                to={link.path}
                 key={link.text}
-                className="relative group cursor-pointer"
+                className="relative text-white hover:text-accent transition-all duration-300 nav-link group cursor-pointer"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <span className="text-white hover:text-accent transition-all duration-300 transform hover:scale-110 inline-block">
-                  {link.text}
-                </span>
-                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-accent to-orange-500 group-hover:w-full transition-all duration-500" />
-                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white/50 group-hover:w-full transition-all duration-300 delay-100" />
-              </div>
+                {link.text}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
+              </Link>
             ))}
           </div>
         </div>
+        
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-black/90 backdrop-blur-lg mt-2 py-4 px-4 rounded-lg border border-gray-800 animate-fade-in-down">
+            {[
+              { text: "Home", path: "/" },
+              { text: "About", path: "/about" },
+              { text: "Contact", path: "/contact" },
+              { text: "Terms", path: "/terms" },
+              { text: "Privacy", path: "/privacy" },
+            ].map((link, index) => (
+              <Link 
+                to={link.path}
+                key={link.text}
+                className="block py-2 text-white hover:text-accent transition-all duration-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.text}
+              </Link>
+            ))}
+          </div>
+        )}
       </nav>
+
 
       {/* Revolutionary Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">

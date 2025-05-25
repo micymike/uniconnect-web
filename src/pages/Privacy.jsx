@@ -3,13 +3,31 @@ import "../App.css";
 import { Link } from "react-router-dom";
 
 export default function Privacy() {
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+
+
+  const [scrollWidth, setScrollWidth] = React.useState(0);
+  
+  const handleScroll = () => {
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = (document.documentElement.scrollTop / height) * 100;
+    setScrollWidth(progress);
+  };
+
+  React.useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
   return (
     <div className="min-h-screen font-sans bg-gradient-custom text-white overflow-x-hidden">
       
       {/* Scroll Progress Indicator */}
       <div 
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-accent to-orange-600 z-50 transition-all duration-300"
-        style={{ width: `0%` }}
+        style={{ width: `${scrollWidth}%` }}
       />
       
       {/* Mouse Follower */}
@@ -22,14 +40,28 @@ export default function Privacy() {
         }}
       />
 
-      {/* Enhanced Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-4 backdrop-blur-lg bg-black/20 border-b border-white/10 transition-all duration-500">
+ <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-4 backdrop-blur-lg bg-black/20 border-b border-white/10 transition-all duration-500">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="text-2xl font-bold group cursor-pointer">
             <span className="group-hover:animate-pulse text-white">Uni</span>
             <span className="text-accent group-hover:text-orange-400 transition-colors duration-300">Connect</span>
           </div>
-          <div className="flex gap-6">
+          
+          {/* Mobile Menu Button */}
+          <button className="md:hidden text-white focus:outline-none" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+          
+          {/* Desktop Menu */}
+          <div className="hidden md:flex gap-6">
             {[
               { text: "Home", path: "/" },
               { text: "About", path: "/about" },
@@ -49,6 +81,28 @@ export default function Privacy() {
             ))}
           </div>
         </div>
+        
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-black/90 backdrop-blur-lg mt-2 py-4 px-4 rounded-lg border border-gray-800 animate-fade-in-down">
+            {[
+              { text: "Home", path: "/" },
+              { text: "About", path: "/about" },
+              { text: "Contact", path: "/contact" },
+              { text: "Terms", path: "/terms" },
+              { text: "Privacy", path: "/privacy" },
+            ].map((link, index) => (
+              <Link 
+                to={link.path}
+                key={link.text}
+                className="block py-2 text-white hover:text-accent transition-all duration-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.text}
+              </Link>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* Header Section */}
