@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import About from "./pages/About"
 import Contact from "./pages/Contact"
 import Terms from "./pages/Terms"
+import Privacy from "./pages/Privacy"
 
 // Floating particles component
 const FloatingParticles = () => {
@@ -232,6 +233,7 @@ function HomePage() {
               { text: "About", path: "/about" },
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
+              { text: "Privacy", path: "/privacy" },
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -662,6 +664,7 @@ function HomePage() {
                 { text: "About", path: "/about" },
                 { text: "Contact", path: "/contact" },
                 { text: "Terms", path: "/terms" },
+                { text: "Privacy", path: "/privacy" },
               ].map((link) => (
                 <Link 
                   to={link.path}
@@ -908,6 +911,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
     </Router>
   )

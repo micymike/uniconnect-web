@@ -555,7 +555,21 @@ export default function About() {
               },
               {
                 name: "Kennedy",
-                role: "Head of Growth",
+                role: "Head of Marketing",
+                bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
+                skills: ["Marketing", "Community", "Business Strategy"],
+                social: { linkedin: "#", twitter: "#", github: "#" }
+              },
+              {
+                name: "Sumare",
+                role: "Head of Marketting",
+                bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
+                skills: ["Marketing", "Community", "Business Strategy"],
+                social: { linkedin: "#", twitter: "#", github: "#" }
+              },
+              {
+                name: "Wafula Sheila",
+                role: "Software Engineer",
                 bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
