@@ -25,7 +25,7 @@ export default function Contact() {
     
     try {
       // Google Sheet script URL from environment variables
-      const scriptURL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || process.env.REACT_APP_GOOGLE_SCRIPT_URL;
+      const scriptURL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
       
       // Add timestamp to the form data
       const formDataToSend = new FormData();
