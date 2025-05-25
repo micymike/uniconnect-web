@@ -13,6 +13,27 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState(null);
   
+  // Test connection to Google Script when component mounts
+  React.useEffect(() => {
+    const testConnection = async () => {
+      const scriptURL = "https://script.google.com/macros/s/AKfycbz4nP2ZlEI5IbP06TTA466YAvfqdx-2HODT2toZ1sjrxG5ppNqo0JfQVzpVq6RJA7Y/exec";
+      console.log("Testing connection to Google Script...");
+      try {
+        const testData = new FormData();
+        testData.append('test', 'connection');
+        await fetch(scriptURL, { 
+          method: 'GET',
+          mode: 'no-cors'
+        });
+        console.log("Connection test completed");
+      } catch (error) {
+        console.error("Connection test failed:", error);
+      }
+    };
+    
+    testConnection();
+  }, []);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -24,8 +45,8 @@ export default function Contact() {
     setSubmitStatus(null);
     
     try {
-      // Google Sheet script URL from environment variables
-      const scriptURL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      // Google Sheet script URL - hardcoded for now to fix deployment issue
+      const scriptURL = "https://script.google.com/macros/s/AKfycbz4nP2ZlEI5IbP06TTA466YAvfqdx-2HODT2toZ1sjrxG5ppNqo0JfQVzpVq6RJA7Y/exec";
       
       // Add timestamp to the form data
       const formDataToSend = new FormData();
@@ -34,26 +55,41 @@ export default function Contact() {
         formDataToSend.append(key, value);
       });
       
-      const response = await fetch(scriptURL, {
-        method: 'POST',
-        body: formDataToSend
+      console.log("Submitting to:", scriptURL);
+      console.log("Form data:", Object.fromEntries(formDataToSend));
+      
+      // Use XMLHttpRequest instead of fetch for better compatibility
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', scriptURL);
+        xhr.onload = function() {
+          console.log("Response received:", xhr.status, xhr.responseText);
+          if (xhr.status === 200) {
+            resolve();
+          } else {
+            reject(new Error('Form submission failed'));
+          }
+        };
+        xhr.onerror = function() {
+          console.error("XHR Error");
+          reject(new Error('Form submission failed'));
+        };
+        xhr.send(formDataToSend);
       });
       
-      if (response.ok) {
-        setSubmitStatus({
-          success: true,
-          message: "Thank you! Your message has been sent successfully."
-        });
-        // Reset form
-        setFormData({
-          name: "",
-          email: "",
-          subject: "",
-          message: ""
-        });
-      } else {
-        throw new Error('Network response was not ok');
-      }
+      // When using no-cors, we can't check response.ok
+      // So we'll assume success if no error is thrown
+      setSubmitStatus({
+        success: true,
+        message: "Thank you! Your message has been sent successfully."
+      });
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+      });
     } catch (error) {
       console.error('Error:', error);
       setSubmitStatus({
