@@ -4,7 +4,66 @@ import { Link } from "react-router-dom";
 
 export default function Contact() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  //const [scrollProgress, setScrollProgress] = React.useState(0);
+  const [formData, setFormData] = React.useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitStatus, setSubmitStatus] = React.useState(null);
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    
+    try {
+      // Google Sheet script URL from environment variables
+      const scriptURL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || process.env.REACT_APP_GOOGLE_SCRIPT_URL;
+      
+      // Add timestamp to the form data
+      const formDataToSend = new FormData();
+      formDataToSend.append('timestamp', new Date().toISOString());
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
+      
+      const response = await fetch(scriptURL, {
+        method: 'POST',
+        body: formDataToSend
+      });
+      
+      if (response.ok) {
+        setSubmitStatus({
+          success: true,
+          message: "Thank you! Your message has been sent successfully."
+        });
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: ""
+        });
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSubmitStatus({
+        success: false,
+        message: "Oops! Something went wrong. Please try again later."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen font-sans bg-gradient-custom text-white overflow-x-hidden">
       
@@ -114,14 +173,18 @@ export default function Contact() {
                 Have questions about UniConnect? Want to partner with us? Fill out the form and we'll get back to you as soon as possible.
               </p>
               
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label htmlFor="name" className="block text-white mb-2">Your Name</label>
                   <input 
                     type="text" 
                     id="name" 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
                     placeholder="Enter your name"
+                    required
                   />
                 </div>
                 
@@ -130,8 +193,12 @@ export default function Contact() {
                   <input 
                     type="email" 
                     id="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
                     placeholder="Enter your email"
+                    required
                   />
                 </div>
                 
@@ -140,8 +207,12 @@ export default function Contact() {
                   <input 
                     type="text" 
                     id="subject" 
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
                     className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
                     placeholder="What is this regarding?"
+                    required
                   />
                 </div>
                 
@@ -149,17 +220,36 @@ export default function Contact() {
                   <label htmlFor="message" className="block text-white mb-2">Your Message</label>
                   <textarea 
                     id="message" 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
                     rows="5" 
                     className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
                     placeholder="Type your message here..."
+                    required
                   ></textarea>
                 </div>
                 
+                {submitStatus && (
+                  <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                    {submitStatus.message}
+                  </div>
+                )}
+                
                 <button 
                   type="submit" 
-                  className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md"
+                  className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md flex items-center justify-center"
+                  disabled={isSubmitting}
                 >
-                  Send Message
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : "Send Message"}
                 </button>
               </form>
             </div>
