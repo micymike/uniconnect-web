@@ -353,6 +353,11 @@ body {
   }
 }
 
+/* Coming Soon Tooltip Animation */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
 /* CSS Animations to replace Framer Motion */
 .fade-in {
   animation: fadeIn 0.8s ease-in-out forwards;

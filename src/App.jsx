@@ -29,8 +29,9 @@ const FloatingParticles = () => {
 }
 
 // Magnetic button component
-const MagneticButton = ({ children, className, onClick, ...props }) => {
+const MagneticButton = ({ children, className, onClick, comingSoon = false, ...props }) => {
   const buttonRef = useRef(null)
+  const [showTooltip, setShowTooltip] = useState(false)
   
   const handleMouseMove = (e) => {
     const button = buttonRef.current
@@ -46,19 +47,49 @@ const MagneticButton = ({ children, className, onClick, ...props }) => {
     if (buttonRef.current) {
       buttonRef.current.style.transform = 'translate(0px, 0px) scale(1)'
     }
+    setShowTooltip(false)
+  }
+  
+  const handleMouseEnter = () => {
+    if (comingSoon) {
+      setShowTooltip(true)
+    }
+  }
+  
+  const handleButtonClick = (e) => {
+    if (comingSoon) {
+      e.preventDefault()
+      return
+    }
+    
+    if (onClick) {
+      onClick(e)
+    }
   }
   
   return (
-    <button
-      ref={buttonRef}
-      className={`magnetic-button ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      {...props}
-    >
-      {children}
-    </button>
+    <div className="relative inline-block">
+      <button
+        ref={buttonRef}
+        className={`magnetic-button ${className} ${comingSoon ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={handleButtonClick}
+        {...props}
+      >
+        {children}
+      </button>
+      
+      {comingSoon && showTooltip && (
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-black/80 backdrop-blur-sm text-white text-sm py-2 px-4 rounded-lg shadow-lg z-50 whitespace-nowrap animate-fade-in">
+          <div className="flex items-center gap-2">
+            <span className="text-accent">🚧</span> Coming Soon!
+          </div>
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-black/80"></div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -321,7 +352,10 @@ function HomePage() {
             <span className="text-orange-200 font-semibold"> vibrant student marketplace</span>.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center hero-buttons">
-            <MagneticButton className="bg-accent hover:bg-accent-hover text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-accent/25 transition-all duration-500 transform hover:scale-105 glow-button">
+            <MagneticButton 
+              className="bg-accent hover:bg-accent-hover text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-accent/25 transition-all duration-500 transform hover:scale-105 glow-button"
+              comingSoon={true}
+            >
               <span className="flex items-center gap-2">
                 📱 Download App
                 <span className="animate-bounce">→</span>
@@ -584,12 +618,18 @@ function HomePage() {
                 transform your campus life.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <MagneticButton className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg">
+                <MagneticButton 
+                  className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg"
+                  comingSoon={true}
+                >
                   <span className="flex items-center gap-2">
                     📱 Download for iOS
                   </span>
                 </MagneticButton>
-                <MagneticButton className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg">
+                <MagneticButton 
+                  className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg"
+                  comingSoon={true}
+                >
                   <span className="flex items-center gap-2">
                     🤖 Download for Android
                   </span>
@@ -677,7 +717,10 @@ function HomePage() {
             <p className="text-xl text-white mb-8">
               Join thousands of students already benefiting from UniConnect's innovative platform.
             </p>
-            <MagneticButton className="bg-white text-accent hover:bg-gray-100 px-12 py-4 text-xl rounded-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl">
+            <MagneticButton 
+              className="bg-white text-accent hover:bg-gray-100 px-12 py-4 text-xl rounded-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl"
+              comingSoon={true}
+            >
               <span className="flex items-center gap-3">
                 🚀 Download UniConnect Now
                 <span className="animate-bounce">↗</span>

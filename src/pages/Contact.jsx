@@ -161,7 +161,7 @@ Timestamp: ${new Date().toISOString()}
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
               { text: "Admin", path: "/admin" },
-            ].map((link, index) => (
+            ].map((link) => (
               <Link 
                 to={link.path}
                 key={link.text}
