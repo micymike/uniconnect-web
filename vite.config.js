@@ -11,6 +11,6 @@ export default defineConfig({
     cors: {
       origin: '*',
     },
-    allowedHosts: ['uniconnect-web-fsm9.onrender.com']
+    allowedHosts: ['uniconnect-web-fsm9.onrender.com', 'www.uniconnect.store', 'uniconnect.store'],
   }
 })

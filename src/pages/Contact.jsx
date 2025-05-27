@@ -13,27 +13,6 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState(null);
   
-  // Test connection to Google Script when component mounts
-  React.useEffect(() => {
-    const testConnection = async () => {
-      const scriptURL = "https://script.google.com/macros/s/AKfycbz4nP2ZlEI5IbP06TTA466YAvfqdx-2HODT2toZ1sjrxG5ppNqo0JfQVzpVq6RJA7Y/exec";
-      console.log("Testing connection to Google Script...");
-      try {
-        const testData = new FormData();
-        testData.append('test', 'connection');
-        await fetch(scriptURL, { 
-          method: 'GET',
-          mode: 'no-cors'
-        });
-        console.log("Connection test completed");
-      } catch (error) {
-        console.error("Connection test failed:", error);
-      }
-    };
-    
-    testConnection();
-  }, []);
-  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -45,44 +24,34 @@ export default function Contact() {
     setSubmitStatus(null);
     
     try {
-      // Google Sheet script URL - hardcoded for now to fix deployment issue
-      const scriptURL = "https://script.google.com/macros/s/AKfycbz4nP2ZlEI5IbP06TTA466YAvfqdx-2HODT2toZ1sjrxG5ppNqo0JfQVzpVq6RJA7Y/exec";
-      
       // Add timestamp to the form data
-      const formDataToSend = new FormData();
-      formDataToSend.append('timestamp', new Date().toISOString());
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
-      });
+      const feedbackData = {
+        ...formData,
+        timestamp: new Date().toISOString()
+      };
       
-      console.log("Submitting to:", scriptURL);
-      console.log("Form data:", Object.fromEntries(formDataToSend));
+      // Store in localStorage (our simple database for now)
+      const existingFeedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
+      existingFeedbacks.push(feedbackData);
+      localStorage.setItem("feedbacks", JSON.stringify(existingFeedbacks));
       
-      // Use XMLHttpRequest instead of fetch for better compatibility
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', scriptURL);
-        xhr.onload = function() {
-          console.log("Response received:", xhr.status, xhr.responseText);
-          if (xhr.status === 200) {
-            resolve();
-          } else {
-            reject(new Error('Form submission failed'));
-          }
-        };
-        xhr.onerror = function() {
-          console.error("XHR Error");
-          reject(new Error('Form submission failed'));
-        };
-        xhr.send(formDataToSend);
-      });
+      // Also save to downloadable JSON file format
+      try {
+        // Create a blob with the JSON data
+        const jsonData = JSON.stringify(existingFeedbacks, null, 2);
+        
+        // Store the latest data in sessionStorage for admin page to access
+        sessionStorage.setItem("latestFeedbackData", jsonData);
+      } catch (fileError) {
+        console.error("Error preparing feedback data:", fileError);
+      }
       
-      // When using no-cors, we can't check response.ok
-      // So we'll assume success if no error is thrown
+      // Show success message
       setSubmitStatus({
         success: true,
         message: "Thank you! Your message has been sent successfully."
       });
+      
       // Reset form
       setFormData({
         name: "",
@@ -100,6 +69,26 @@ export default function Contact() {
       setIsSubmitting(false);
     }
   };
+
+  // Alternative email submission method
+  const handleEmailSubmit = () => {
+    const subject = encodeURIComponent(`Contact Form: ${formData.subject}`);
+    const body = encodeURIComponent(`
+Name: ${formData.name}
+Email: ${formData.email}
+Subject: ${formData.subject}
+
+Message:
+${formData.message}
+
+---
+Sent from UniConnect Contact Form
+Timestamp: ${new Date().toISOString()}
+    `);
+    
+    window.open(`mailto:uniconnect693@gmail.com?subject=${subject}&body=${body}`);
+  };
+
   return (
     <div className="min-h-screen font-sans bg-gradient-custom text-white overflow-x-hidden">
       
@@ -119,7 +108,7 @@ export default function Contact() {
         }}
       />
 
- <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-4 backdrop-blur-lg bg-black/20 border-b border-white/10 transition-all duration-500">
+      <nav className="fixed top-0 left-0 right-0 z-50 py-4 px-4 backdrop-blur-lg bg-black/20 border-b border-white/10 transition-all duration-500">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="text-2xl font-bold group cursor-pointer">
             <span className="group-hover:animate-pulse text-white">Uni</span>
@@ -147,6 +136,7 @@ export default function Contact() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
+              { text: "Admin", path: "/admin" },
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -170,6 +160,7 @@ export default function Contact() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
+              { text: "Admin", path: "/admin" },
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -183,6 +174,7 @@ export default function Contact() {
           </div>
         )}
       </nav>
+
       {/* Header Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-6xl mx-auto">
@@ -218,7 +210,7 @@ export default function Contact() {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
+                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white placeholder-gray-400"
                     placeholder="Enter your name"
                     required
                   />
@@ -232,7 +224,7 @@ export default function Contact() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
+                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white placeholder-gray-400"
                     placeholder="Enter your email"
                     required
                   />
@@ -246,7 +238,7 @@ export default function Contact() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
+                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white placeholder-gray-400"
                     placeholder="What is this regarding?"
                     required
                   />
@@ -260,33 +252,44 @@ export default function Contact() {
                     value={formData.message}
                     onChange={handleInputChange}
                     rows="5" 
-                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
+                    className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white placeholder-gray-400"
                     placeholder="Type your message here..."
                     required
                   ></textarea>
                 </div>
                 
                 {submitStatus && (
-                  <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                  <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}`}>
                     {submitStatus.message}
                   </div>
                 )}
                 
-                <button 
-                  type="submit" 
-                  className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md flex items-center justify-center"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Sending...
-                    </>
-                  ) : "Send Message"}
-                </button>
+                <div className="flex gap-3">
+                  <button 
+                    type="submit" 
+                    className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md flex items-center justify-center flex-1"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : "Send Message"}
+                  </button>
+                  
+                  <button 
+                    type="button"
+                    onClick={handleEmailSubmit}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 text-sm rounded-md flex items-center justify-center"
+                    title="Open in email client"
+                  >
+                    📧 Email
+                  </button>
+                </div>
               </form>
             </div>
             
@@ -310,7 +313,10 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-white">Email</h4>
-                    <p className="text-white">info@uniconnect.com<br />support@uniconnect.com</p>
+                    <p className="text-white">
+                      <a href="mailto:uniconnect693@gmail.com" className="hover:text-accent transition-colors">uniconnect693@gmail.com</a><br />
+                      <a href="mailto:uniconnect693@gmail.com" className="hover:text-accent transition-colors">uniconnect693@gmail.com</a>
+                    </p>
                   </div>
                 </div>
                 
@@ -320,7 +326,10 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-white">Phone</h4>
-                    <p className="text-white">+254 700 123 456<br />+254 733 987 654</p>
+                    <p className="text-white">
+                      <a href="tel:+254700123456" className="hover:text-accent transition-colors">+254 700 123 456</a><br />
+                      <a href="tel:+254733987654" className="hover:text-accent transition-colors">+254 733 987 654</a>
+                    </p>
                   </div>
                 </div>
                 
@@ -368,7 +377,6 @@ export default function Contact() {
           </div>
           
           <div className="relative h-[400px] rounded-xl overflow-hidden border-8 border-darker shadow-xl fade-in-up">
-            {/* This would be replaced with an actual map component */}
             <iframe
               src="https://www.openstreetmap.org/export/embed.html?bbox=37.009%2C-1.098%2C37.019%2C-1.090&layer=mapnik&marker=-1.09444%2C37.01417"
               className="w-full h-[400px]"
@@ -398,6 +406,7 @@ export default function Contact() {
                 { text: "Contact", path: "/contact" },
                 { text: "Terms", path: "/terms" },
                 { text: "Privacy", path: "/privacy" },
+                { text: "Admin", path: "/admin" },
               ].map((link) => (
                 <Link 
                   to={link.path}
@@ -493,6 +502,17 @@ export default function Contact() {
           }
         }
         
+        @keyframes fade-in-down {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
         .animate-float {
           animation: float 20s ease-in-out infinite;
         }
@@ -515,6 +535,10 @@ export default function Contact() {
         
         .animate-bounce-slow {
           animation: bounce-slow 2s ease-in-out infinite;
+        }
+        
+        .animate-fade-in-down {
+          animation: fade-in-down 0.3s ease-out forwards;
         }
         
         .fade-in-up {
@@ -622,6 +646,14 @@ export default function Contact() {
           background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
         }
         
+        .bg-darker {
+          background-color: #1a1a1a;
+        }
+        
+        .bg-dark {
+          background-color: #2a2a2a;
+        }
+        
         .text-accent { color: #FF6B35; }
         .bg-accent { background-color: #FF6B35; }
         .bg-accent-hover { background-color: #FF8C42; }
@@ -629,6 +661,15 @@ export default function Contact() {
         .border-accent { border-color: #FF6B35; }
         .hover\\:border-accent:hover { border-color: #FF6B35; }
         .shadow-accent\\/25 { box-shadow: 0 25px 50px -12px rgba(255, 107, 53, 0.25); }
+        
+        .button-hover {
+          transition: all 0.3s ease;
+        }
+        
+        .button-hover:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+        }
       `}</style>
     </div>
   );
