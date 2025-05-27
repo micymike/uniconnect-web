@@ -305,7 +305,7 @@ function HomePage() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
-            ].map((link, index) => (
+            ].map((link) => (
               <Link 
                 to={link.path}
                 key={link.text}
@@ -517,10 +517,12 @@ function HomePage() {
                 <p className="text-white mb-6 group-hover:text-gray-200 transition-colors duration-300">
                   {feature.description}
                 </p>
-                <MagneticButton className="bg-accent hover:bg-accent-hover backdrop-blur-sm p-3 flex items-center text-white rounded-lg transition-all duration-300 group">
-                  Learn more 
-                  <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
-                </MagneticButton>
+                <Link to={`/services/${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <MagneticButton className="bg-accent hover:bg-accent-hover backdrop-blur-sm p-3 flex items-center text-white rounded-lg transition-all duration-300 group">
+                    Learn more 
+                    <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
+                  </MagneticButton>
+                </Link>
               </TiltCard>
             ))}
           </div>
@@ -995,6 +997,11 @@ function HomePage() {
 }
 
 
+// Service pages
+import MealSharing from "./pages/MealSharing"
+import RentalListings from "./pages/RentalListings"
+import StudentMarketplace from "./pages/StudentMarketplace"
+
 // Main App component with routing
 export default function App() {
   return (
@@ -1006,6 +1013,9 @@ export default function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/services/meal-sharing-network" element={<MealSharing />} />
+        <Route path="/services/rental-listings" element={<RentalListings />} />
+        <Route path="/services/student-marketplace" element={<StudentMarketplace />} />
       </Routes>
     </Router>
   )
