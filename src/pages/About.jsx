@@ -602,22 +602,43 @@ export default function About() {
               {
                 name: "Sumare",
                 role: "Head of Marketting",
-                bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
+                bio: "Marketing guru with a knack for building communities and driving engagement through innovative strategies.",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
               {
                 name: "Justus",
                 role: "Marketing lead",
-                bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
+                bio: "Event planner and marketing strategist with a passion for connecting students and enhancing campus life.",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
               {
                 name: "Wafula Sheila",
                 role: "Software Engineer",
-                bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
+                bio: "A generative AI dev and proficient in frontend dev with a passion for creating intuitive user interfaces.",
+                skills: ["Frontend Development", "AI", "User Experience"],
+                social: { linkedin: "#", twitter: "#", github: "#" }
+              },
+              {
+                name: "Cyrose",
+                role: "Marketer",
+                bio: "A tech enthusiast. With a knack for coding and sales, he brings a unique blend of technical and business acumen to the team.",
+                skills: ["Tech", "Coding", "Sales"],
+                social: { linkedin: "#", twitter: "#", github: "#" }
+              },
+              {
+                name: "Koome",
+                role: "Marketing lead",
+                bio: "A dedicated project manager and business graduate with a strong foundation in marketing, he excels in leading projects that enhance student engagement and support. Passionate about fostering a positive community.",
                 skills: ["Marketing", "Community", "Business Strategy"],
+                social: { linkedin: "#", twitter: "#", github: "#" }
+              },
+              {
+                name: "Deborah",
+                role: "Marketer",
+                bio: "She is good in networking and sales. With a passion for connecting students and enhancing campus life.",
+                skills: ["Networking", "Sales", "Marketing"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               }
             ].map((member, index) => (
@@ -630,7 +651,35 @@ export default function About() {
                     <div className="avatar-container">
                       <div className="avatar-ring" />
                       <div className="avatar-image">
-                        <span className="text-4xl">{member.name.charAt(0)}</span>
+                        {(() => {
+                          const imageMap = {
+                            "Michael Moses": "/images/mike.jpg",
+                            "James": "/images/james.jpg",
+                            "Justus": "/images/justus.jpeg",
+                            "Kennedy": "/images/kennedy.jpeg",
+                            "Sumare": "/images/sumare.jpeg",
+                            "Wafula Sheila": "/images/sheila.jpeg",
+                            "Cyrose": "/images/Cyrose.jpeg",
+                            "Koome": "/images/koome.jpeg",
+                            "Deborah": "/images/deborah.jpeg"
+                          };
+                          const imgSrc = imageMap[member.name];
+                          if (imgSrc) {
+                            return (
+                              <img
+                                src={imgSrc}
+                                alt={member.name}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "50%"
+                                }}
+                              />
+                            );
+                          }
+                          return <span className="text-4xl">{member.name.charAt(0)}</span>;
+                        })()}
                       </div>
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">{member.name}</h3>
