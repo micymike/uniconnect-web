@@ -1,0 +1,27 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Main sitemap
+Sitemap: https://uniconnect.store/sitemap.xml
+
+# Important pages that should be crawled
+Allow: /about
+Allow: /marketplace
+Allow: /rental-listings
+Allow: /meal-sharing
+Allow: /contact
+
+# Prevent crawling of admin areas
+Disallow: /admin
+Disallow: /admin/*
+
+# Prevent crawling of private user data
+Disallow: /user/*/private
+Disallow: /api/*
+
+# Crawl-delay directive
+Crawl-delay: 10
+
+# Host
+Host: https://uniconnect.store

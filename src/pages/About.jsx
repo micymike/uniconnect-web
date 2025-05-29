@@ -432,7 +432,7 @@ export default function About() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl mb-12 max-w-4xl mx-auto text-gray-300 leading-relaxed">
-              We're not just building an app—we're crafting the future of campus life through 
+              We're not just building an app— we're crafting the future of campus life through 
               <span className="text-accent font-semibold"> revolutionary technology</span> and 
               <span className="text-orange-400 font-semibold"> human connection</span>.
             </p>
@@ -602,6 +602,13 @@ export default function About() {
               {
                 name: "Sumare",
                 role: "Head of Marketting",
+                bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
+                skills: ["Marketing", "Community", "Business Strategy"],
+                social: { linkedin: "#", twitter: "#", github: "#" }
+              },
+              {
+                name: "Justus",
+                role: "Marketing lead",
                 bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }

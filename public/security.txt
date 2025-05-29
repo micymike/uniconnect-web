@@ -1,0 +1,8 @@
+# Security Policy
+Contact: mailto:security@uniconnect.store
+Expires: 2026-05-27T12:00:00.000Z
+Encryption: https://uniconnect.store/pgp-key.txt
+Preferred-Languages: en
+Canonical: https://uniconnect.store/.well-known/security.txt
+Policy: https://uniconnect.store/security-policy
+Hiring: https://uniconnect.store/careers
