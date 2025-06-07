@@ -607,9 +607,9 @@ export default function About() {
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
               {
-                name: "Justus",
-                role: "Marketing lead",
-                bio: "Event planner and marketing strategist with a passion for connecting students and enhancing campus life.",
+                name: "Rover Justus ",
+                role: "The Campus Deal Maker 🤝",
+                bio: "At JKUAT, He is that one guy who always “knows a guy.” From helping you find a house, a buyer, a seller —or even anything on   campus l—he connects the dots. Trusted, smooth, and always plugged in. Your go-to for smart, stress-free deals. 💼🎯",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
