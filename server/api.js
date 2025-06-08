@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { parse } from 'url';
+import { recordVisit, getAnalytics, resetAnalytics } from './analytics.js';
 
 // Get the directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -118,6 +119,36 @@ export default function setupFeedbackApi(middlewares) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ error: 'Failed to delete feedback' }));
       }
+    }
+    
+    // GET /api/analytics - Get analytics data
+    if (pathname === '/api/analytics' && req.method === 'GET') {
+      const analytics = getAnalytics();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify(analytics));
+    }
+    
+    // POST /api/analytics/reset - Reset analytics
+    if (pathname === '/api/analytics/reset' && req.method === 'POST') {
+      resetAnalytics();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ message: 'Analytics reset successfully' }));
+    }
+    
+    // Record visit for actual page views only
+    if (!pathname.startsWith('/api/') && isActualPageView(pathname)) {
+      recordVisit(req);
+    }
+    
+    // Helper function to identify actual page views
+    function isActualPageView(path) {
+      // Only count main routes as page views
+      const mainRoutes = ['/', '/about', '/contact', '/terms', '/privacy', '/admin', 
+                         '/meal-sharing', '/rental-listings', '/marketplace'];
+      
+      // Check if it's a main route or has a file extension (excluding assets)
+      return mainRoutes.includes(path) || 
+             (path.indexOf('.') === -1 && !path.includes('node_modules'));
     }
     
     // Continue to next middleware if not handled

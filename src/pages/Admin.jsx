@@ -9,6 +9,12 @@ export default function Admin() {
   const [error, setError] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [analytics, setAnalytics] = useState({ 
+    totalVisits: 0, 
+    uniqueVisitors: 0, 
+    pageViews: {},
+    lastReset: new Date().toISOString()
+  });
 
   // Check if user is already logged in
   useEffect(() => {
@@ -16,6 +22,7 @@ export default function Admin() {
     if (loggedIn === "true") {
       setIsLoggedIn(true);
       fetchFeedbacks();
+      fetchAnalytics();
     }
     // eslint-disable-next-line
   }, []);
@@ -26,6 +33,7 @@ export default function Admin() {
       setIsLoggedIn(true);
       localStorage.setItem("adminLoggedIn", "true");
       fetchFeedbacks();
+      fetchAnalytics();
     } else {
       setError("Invalid email or password");
     }
@@ -46,6 +54,55 @@ export default function Admin() {
     } catch (err) {
       setFeedbacks([]);
     }
+  };
+  
+  // Fetch analytics data
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch("/api/analytics");
+      if (!response.ok) throw new Error("Failed to fetch analytics");
+      const data = await response.json();
+      setAnalytics(data);
+    } catch (err) {
+      console.error("Error fetching analytics:", err);
+    }
+  };
+  
+  // Reset analytics data
+  const resetAnalytics = async () => {
+    try {
+      const response = await fetch("/api/analytics/reset", { method: "POST" });
+      if (!response.ok) throw new Error("Failed to reset analytics");
+      fetchAnalytics();
+    } catch (err) {
+      console.error("Error resetting analytics:", err);
+    }
+  };
+  
+  // Helper function to filter out development-related paths
+  const shouldFilterPage = (page) => {
+    const devPatterns = [
+      'node_modules', 
+      '@vite', 
+      '@react-refresh', 
+      '.jsx', 
+      '.js', 
+      '.css', 
+      '.mjs',
+      '?t='
+    ];
+    return devPatterns.some(pattern => page.includes(pattern));
+  };
+  
+  // Helper function to make page names more readable
+  const getPageName = (path) => {
+    if (path === '/') return 'Home';
+    
+    // Remove leading slash and capitalize
+    return path.substring(1)
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   // Delete feedback by id
@@ -277,6 +334,57 @@ export default function Admin() {
               ))}
             </div>
           )}
+        </div>
+        
+        {/* Analytics Section */}
+        <div className="bg-gradient-to-br from-darker to-dark p-8 rounded-xl border border-accent/20 mt-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Site Analytics</h2>
+            <button
+              onClick={resetAnalytics}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md button-hover"
+            >
+              Reset Analytics
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-black/30 p-6 rounded-lg text-center">
+              <h3 className="text-accent text-lg mb-2">Total Visits</h3>
+              <p className="text-4xl font-bold">{analytics.totalVisits}</p>
+            </div>
+            
+            <div className="bg-black/30 p-6 rounded-lg text-center">
+              <h3 className="text-accent text-lg mb-2">Unique Visitors</h3>
+              <p className="text-4xl font-bold">{analytics.uniqueVisitors}</p>
+            </div>
+            
+            <div className="bg-black/30 p-6 rounded-lg text-center">
+              <h3 className="text-accent text-lg mb-2">Last Reset</h3>
+              <p className="text-sm">{new Date(analytics.lastReset).toLocaleString()}</p>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <h3 className="text-xl font-bold mb-4">Page Views</h3>
+            <div className="bg-black/30 p-4 rounded-lg">
+              {Object.entries(analytics.pageViews).length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(analytics.pageViews)
+                    .filter(([page]) => !shouldFilterPage(page))
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([page, count]) => (
+                      <div key={page} className="flex justify-between items-center border-b border-gray-700 py-2">
+                        <span className="text-gray-300">{getPageName(page)}</span>
+                        <span className="text-accent font-bold">{count}</span>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-gray-400">No page views recorded yet.</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
