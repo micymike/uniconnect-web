@@ -30,22 +30,17 @@ export default function Contact() {
         timestamp: new Date().toISOString()
       };
       
-      // Store in localStorage (our simple database for now)
-      const existingFeedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
-      existingFeedbacks.push(feedbackData);
-      localStorage.setItem("feedbacks", JSON.stringify(existingFeedbacks));
-      
-      // Also save to downloadable JSON file format
-      try {
-        // Create a blob with the JSON data
-        const jsonData = JSON.stringify(existingFeedbacks, null, 2);
-        
-        // Store the latest data in sessionStorage for admin page to access
-        sessionStorage.setItem("latestFeedbackData", jsonData);
-      } catch (fileError) {
-        console.error("Error preparing feedback data:", fileError);
+      // Send feedback to backend API
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(feedbackData)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send feedback");
       }
-      
+
       // Show success message
       setSubmitStatus({
         success: true,

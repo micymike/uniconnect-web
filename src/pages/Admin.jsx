@@ -9,7 +9,7 @@ export default function Admin() {
   const [error, setError] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   // Check if user is already logged in
   useEffect(() => {
     const loggedIn = localStorage.getItem("adminLoggedIn");
@@ -17,84 +17,95 @@ export default function Admin() {
       setIsLoggedIn(true);
       fetchFeedbacks();
     }
+    // eslint-disable-next-line
   }, []);
-  
+
   const handleLogin = (e) => {
     e.preventDefault();
     if (email === import.meta.env.VITE_APP_ADMIN_EMAIL && password === import.meta.env.VITE_APP_ADMIN_PASSWORD) {
       setIsLoggedIn(true);
-      localStorage.setItem("adminLoggedIn", "true"); 
+      localStorage.setItem("adminLoggedIn", "true");
       fetchFeedbacks();
     } else {
       setError("Invalid email or password");
     }
   };
-  
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     localStorage.removeItem("adminLoggedIn");
   };
-  
-  const fetchFeedbacks = () => {
-    const storedFeedbacks = localStorage.getItem("feedbacks");
-    if (storedFeedbacks) {
-      setFeedbacks(JSON.parse(storedFeedbacks));
+
+  // Fetch feedbacks from backend API
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await fetch("/api/feedback");
+      if (!response.ok) throw new Error("Failed to fetch feedbacks");
+      const data = await response.json();
+      setFeedbacks(data);
+    } catch (err) {
+      setFeedbacks([]);
     }
   };
-  
-  const deleteFeedback = (index) => {
-    const updatedFeedbacks = [...feedbacks];
-    updatedFeedbacks.splice(index, 1);
-    setFeedbacks(updatedFeedbacks);
-    localStorage.setItem("feedbacks", JSON.stringify(updatedFeedbacks));
-    
-    // Update the JSON data for export
-    sessionStorage.setItem("latestFeedbackData", JSON.stringify(updatedFeedbacks, null, 2));
+
+  // Delete feedback by id
+  const deleteFeedback = async (index) => {
+    const feedbackToDelete = feedbacks[index];
+    if (!feedbackToDelete || !feedbackToDelete.id) return;
+    try {
+      const response = await fetch(`/api/feedback/${feedbackToDelete.id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete feedback");
+      // Remove from UI
+      const updatedFeedbacks = feedbacks.filter((_, i) => i !== index);
+      setFeedbacks(updatedFeedbacks);
+    } catch (err) {
+      // Optionally show error
+    }
   };
   
   const exportToJson = () => {
     try {
       // Get the feedback data
       const jsonData = JSON.stringify(feedbacks, null, 2);
-      
+
       // Create a blob with the JSON data
       const blob = new Blob([jsonData], { type: "application/json" });
-      
+
       // Create a URL for the blob
       const url = URL.createObjectURL(blob);
-      
+
       // Create a link element
       const link = document.createElement("a");
       link.href = url;
       link.download = `uniconnect-feedback-${new Date().toISOString().split('T')[0]}.json`;
-      
+
       // Append the link to the body
       document.body.appendChild(link);
-      
+
       // Click the link to trigger the download
       link.click();
-      
+
       // Remove the link from the body
       document.body.removeChild(link);
-      
+
       // Release the URL
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting feedback data:", error);
     }
   };
-  
+
+  // Import from JSON (local only, does not update backend)
   const importFromJson = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const importedData = JSON.parse(e.target.result);
         setFeedbacks(importedData);
-        localStorage.setItem("feedbacks", JSON.stringify(importedData));
-        sessionStorage.setItem("latestFeedbackData", JSON.stringify(importedData, null, 2));
+        // Optionally, send to backend in bulk (not implemented)
       } catch (error) {
         console.error("Error importing feedback data:", error);
         alert("Invalid JSON file format");
