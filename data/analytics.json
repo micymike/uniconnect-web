@@ -1,11 +1,11 @@
 {
-  "totalVisits": 10,
+  "totalVisits": 12,
   "uniqueVisitors": 1,
   "uniqueVisitorIps": "127.0.0.1",
   "pageViews": {
     "/about": 1,
     "/hybridaction/zybTrackerStatisticsAction": 6,
-    "/admin": 3
+    "/admin": 5
   },
   "lastReset": "2025-06-08T17:48:28.067Z"
 }

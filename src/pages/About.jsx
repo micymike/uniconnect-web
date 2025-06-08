@@ -648,40 +648,39 @@ export default function About() {
                 style={{ animationDelay: `${index * 300}ms` }}
                 frontContent={
                   <div className="team-card-front">
-                    <div className="avatar-container">
-                      <div className="avatar-ring" />
-                      <div className="avatar-image">
-                        {(() => {
-                          const imageMap = {
-                            "Michael Moses": "/images/mike.jpg",
-                            "James": "/images/james.jpg",
-                            "Justus": "/images/justus.jpeg",
-                            "Kennedy": "/images/kennedy.jpeg",
-                            "Sumare": "/images/sumare.jpeg",
-                            "Wafula Sheila": "/images/sheila.jpeg",
-                            "Cyrose": "/images/Cyrose.jpeg",
-                            "Koome": "/images/koome.jpeg",
-                            "Deborah": "/images/deborah.jpeg"
-                          };
-                          const imgSrc = imageMap[member.name];
-                          if (imgSrc) {
-                            return (
-                              <img
-                                src={imgSrc}
-                                alt={member.name}
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                  borderRadius: "50%"
-                                }}
-                              />
-                            );
-                          }
-                          return <span className="text-4xl">{member.name.charAt(0)}</span>;
-                        })()}
-                      </div>
-                    </div>
+<div className="avatar-container">
+  <div className="avatar-image">
+    {(() => {
+      const imageMap = {
+        "Michael Moses": "/images/mike.jpg",
+        "James": "/images/james.jpg",
+        "Justus": "/images/justus.jpeg",
+        "Kennedy": "/images/kennedy.jpeg",
+        "Sumare": "/images/sumare.jpeg",
+        "Wafula Sheila": "/images/sheila.jpeg",
+        "Cyrose": "/images/Cyrose.jpeg",
+        "Koome": "/images/koome.jpeg",
+        "Deborah": "/images/deborah.jpeg"
+      };
+      const imgSrc = imageMap[member.name];
+      if (imgSrc) {
+        return (
+          <img
+            src={imgSrc}
+            alt={member.name}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "50%"
+            }}
+          />
+        );
+      }
+      return <span className="text-4xl">{member.name.charAt(0)}</span>;
+    })()}
+  </div>
+</div>
                     <h3 className="text-2xl font-bold text-white mb-2">{member.name}</h3>
                     <p className="text-accent mb-4 font-semibold">{member.role}</p>
                     <p className="text-gray-300 text-sm leading-relaxed">{member.bio}</p>
