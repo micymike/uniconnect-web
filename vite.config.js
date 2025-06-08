@@ -7,10 +7,13 @@ export default defineConfig({
   plugins: [
     react(),
     {
-      name: 'configure-server',
+      name: 'configure-server', 
       configureServer(server) {
         setupFeedbackApi(server.middlewares);
       }
     }
   ],
+  server: {
+    host: '0.0.0.0'
+  }
 })
