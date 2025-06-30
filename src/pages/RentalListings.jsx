@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
+import Footer from "../components/Footer";
 
 // Reuse the FloatingParticles component from App.jsx
 const FloatingParticles = () => {
@@ -616,39 +617,7 @@ export default function RentalListings() {
       </section>
       
       {/* Footer */}
-      <footer className="py-10 px-4 bg-black border-t border-gray-800 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-6 md:mb-0">
-              <Link to="/" className="text-2xl font-bold group cursor-pointer">
-                <span className="group-hover:animate-pulse text-white">Uni</span>
-                <span className="text-accent group-hover:text-orange-400 transition-colors duration-300">Connect</span>
-              </Link>
-            </div>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-              {[
-                { text: "Home", path: "/" },
-                { text: "About", path: "/about" },
-                { text: "Contact", path: "/contact" },
-                { text: "Terms", path: "/terms" },
-                { text: "Privacy", path: "/privacy" },
-              ].map((link) => (
-                <Link 
-                  to={link.path}
-                  key={link.text}
-                  className="relative text-gray-400 hover:text-accent transition-all duration-300 group cursor-pointer"
-                >
-                  {link.text}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="mt-8 text-center text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} UniConnect. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

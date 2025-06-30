@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
+import Footer from "../components/Footer";
 
 // Advanced Floating Particles with Physics
 const AdvancedParticles = () => {
@@ -622,7 +623,7 @@ export default function About() {
               },
               {
                 name: "Cyrose",
-                role: "Marketer",
+                role: "Social media manager",
                 bio: "A tech enthusiast. With a knack for coding and sales, he brings a unique blend of technical and business acumen to the team.",
                 skills: ["Tech", "Coding", "Sales"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
@@ -710,45 +711,9 @@ export default function About() {
           </div>
         </div>
       </section>
-
+<br /><br /><br /><br /><br />
       {/* Revolutionary Footer */}
-      <footer className="py-16 px-4 bg-black border-t border-accent/20 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="footer-glow" />
-        </div>
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-8 md:mb-0">
-              <h3 className="text-3xl font-bold group cursor-pointer">
-                <span className="text-white group-hover:text-orange-300 transition-colors duration-300">Uni</span>
-                <span className="text-accent group-hover:animate-pulse">Connect</span>
-              </h3>
-            </div>
-            <div className="flex gap-8">
-              {[
-                { text: "Home", path: "/" },
-                { text: "About", path: "/about" },
-                { text: "Contact", path: "/contact" },
-                { text: "Terms", path: "/terms" }
-              ].map((link) => (
-                <div 
-                  key={link.text}
-                  className="relative group cursor-pointer"
-                >
-                  <span className="text-gray-400 hover:text-accent transition-all duration-300 transform hover:scale-110 inline-block">
-                    {link.text}
-                  </span>
-                  <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p className="text-lg">© {new Date().getFullYear()} UniConnect. Revolutionizing campus life with ❤️</p>
-          </div>
-        </div>
-      </footer>
+      <Footer className="mt-24" />
 
       <style jsx>{`
         /* Advanced Keyframes */

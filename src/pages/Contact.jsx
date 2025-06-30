@@ -1,6 +1,7 @@
 import React from "react";
 import "../App.css";
 import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
 
 export default function Contact() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -240,119 +241,90 @@ Timestamp: ${new Date().toISOString()}
                 </div>
                 
                 <div>
-                  <label htmlFor="message" className="block text-white mb-2">Your Message</label>
+                  <label htmlFor="message" className="block text-white mb-2">Message</label>
                   <textarea 
                     id="message" 
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
-                    rows="5" 
+                    rows="5"
                     className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white placeholder-gray-400"
-                    placeholder="Type your message here..."
+                    placeholder="Tell us more about your inquiry..."
                     required
-                  ></textarea>
+                  />
                 </div>
                 
-                {submitStatus && (
-                  <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}`}>
-                    {submitStatus.message}
-                  </div>
-                )}
-                
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <button 
                     type="submit" 
-                    className="bg-accent hover:bg-accent-hover button-hover text-white px-8 py-3 text-lg rounded-md flex items-center justify-center flex-1"
                     disabled={isSubmitting}
+                    className="flex-1 bg-accent hover:bg-orange-600 text-white py-3 px-6 rounded-md transition-colors duration-300 disabled:opacity-50"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending...
-                      </>
-                    ) : "Send Message"}
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
                   
                   <button 
                     type="button"
                     onClick={handleEmailSubmit}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 text-sm rounded-md flex items-center justify-center"
-                    title="Open in email client"
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-md transition-colors duration-300"
                   >
-                    📧 Email
+                    Open Email
                   </button>
                 </div>
+                
+                {submitStatus && (
+                  <div className={`p-4 rounded-md ${submitStatus.success ? 'bg-green-600/20 border border-green-600/30' : 'bg-red-600/20 border border-red-600/30'}`}>
+                    <p className={submitStatus.success ? 'text-green-400' : 'text-red-400'}>
+                      {submitStatus.message}
+                    </p>
+                  </div>
+                )}
               </form>
             </div>
-            
-            <div className="bg-gradient-to-br from-darker to-dark p-8 rounded-xl border border-accent/20 fade-in-up delay-200">
-              <h3 className="text-2xl font-bold mb-6 text-white">Contact Information</h3>
-              
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="bg-accent/10 p-3 rounded-full flex items-center justify-center">
-                    <span className="text-accent">📍</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Address</h4>
-                    <p className="text-white">University Campus, Building 4<br />Nairobi, Kenya</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="bg-accent/10 p-3 rounded-full flex items-center justify-center">
-                    <span className="text-accent">📧</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Email</h4>
-                    <p className="text-white">
-                      <a href="mailto:uniconnect693@gmail.com" className="hover:text-accent transition-colors">uniconnect693@gmail.com</a><br />
-                      <a href="mailto:uniconnect693@gmail.com" className="hover:text-accent transition-colors">uniconnect693@gmail.com</a>
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="bg-accent/10 p-3 rounded-full flex items-center justify-center">
-                    <span className="text-accent">📱</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Phone</h4>
-                    <p className="text-white">
-                      <a href="tel:+254700123456" className="hover:text-accent transition-colors">+254 700 123 456</a><br />
-                      <a href="tel:+254733987654" className="hover:text-accent transition-colors">+254 733 987 654</a>
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="bg-accent/10 p-3 rounded-full flex items-center justify-center">
-                    <span className="text-accent">⏰</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Office Hours</h4>
-                    <p className="text-white">Monday - Friday: 9am - 5pm<br />Saturday: 10am - 2pm</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-8">
-                <h4 className="font-bold text-white mb-4">Follow Us</h4>
-                <div className="flex gap-4">
-                  <a href="#" className="bg-accent/10 p-3 rounded-full hover:bg-accent/20 transition-colors">
-                    <span className="text-accent">📘</span>
+            {/* Contact & Socials Card */}
+            <div className="fade-in-up bg-darker rounded-xl border border-accent/20 p-8 flex flex-col gap-4">
+              <h3 className="text-2xl font-bold mb-4 text-accent">Contact & Socials</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-blue-600 text-xl">in</span>
+                  <a href="https://www.linkedin.com/company/uniconnect-ke/" target="_blank" rel="noopener noreferrer" className="hover:text-accent underline break-all">
+                    LinkedIn
                   </a>
-                  <a href="#" className="bg-accent/10 p-3 rounded-full hover:bg-accent/20 transition-colors">
-                    <span className="text-accent">📸</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-pink-500 text-xl">📸</span>
+                  <a href="https://www.instagram.com/uniconnect_nertwork?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="hover:text-accent underline break-all">
+                    Instagram
                   </a>
-                  <a href="#" className="bg-accent/10 p-3 rounded-full hover:bg-accent/20 transition-colors">
-                    <span className="text-accent">🐦</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-black text-xl">🎵</span>
+                  <a href="https://www.tiktok.com/@uniconnect16?_t=ZM-8xbeVPJtsKz&_r=1" target="_blank" rel="noopener noreferrer" className="hover:text-accent underline break-all">
+                    TikTok
                   </a>
-                  <a href="#" className="bg-accent/10 p-3 rounded-full hover:bg-accent/20 transition-colors">
-                    <span className="text-accent">💼</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-accent text-xl">✉️</span>
+                  <a href="mailto:uniconnect693@gmail.com" className="hover:text-accent underline break-all">
+                    uniconnect693@gmail.com
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-accent text-xl">✉️</span>
+                  <a href="mailto:uniconnectnertwork@gmail.com" className="hover:text-accent underline break-all">
+                    uniconnectnertwork@gmail.com
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-green-500 text-xl">📞</span>
+                  <a href="tel:0723634236" className="hover:text-accent underline break-all">
+                    0723 634 236
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-green-500 text-xl">📞</span>
+                  <a href="tel:0758891750" className="hover:text-accent underline break-all">
+                    0758 891 750
                   </a>
                 </div>
               </div>
@@ -361,64 +333,9 @@ Timestamp: ${new Date().toISOString()}
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 fade-in-up">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Find Us</h2>
-            <p className="text-lg md:text-xl max-w-3xl mx-auto text-white">
-              Visit our office on campus
-            </p>
-          </div>
-          
-          <div className="relative h-[400px] rounded-xl overflow-hidden border-8 border-darker shadow-xl fade-in-up">
-            <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=37.009%2C-1.098%2C37.019%2C-1.090&layer=mapnik&marker=-1.09444%2C37.01417"
-              className="w-full h-[400px]"
-              frameBorder="0"
-              scrolling="no"
-              allowFullScreen
-              title="Jomo Kenyatta University of Agriculture and Technology Map"
-            ></iframe>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
-      <footer className="py-10 px-4 bg-black border-t border-gray-800 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-6 md:mb-0">
-              <h3 className="text-2xl font-bold group cursor-pointer">
-                <span className="group-hover:animate-pulse text-white">Uni</span>
-                <span className="text-accent group-hover:text-orange-400 transition-colors duration-300">Connect</span>
-              </h3>
-            </div>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-              {[
-                { text: "Home", path: "/" },
-                { text: "About", path: "/about" },
-                { text: "Contact", path: "/contact" },
-                { text: "Terms", path: "/terms" },
-                { text: "Privacy", path: "/privacy" },
-                { text: "Admin", path: "/admin" },
-              ].map((link) => (
-                <Link 
-                  to={link.path}
-                  key={link.text}
-                  className="relative text-gray-400 hover:text-accent transition-all duration-300 group cursor-pointer"
-                >
-                  {link.text}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-white">
-            <p>© {new Date().getFullYear()} UniConnect. All rights reserved. Made with ❤️ for students.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <style>{`
         @keyframes float {
