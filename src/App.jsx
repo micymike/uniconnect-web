@@ -5,6 +5,7 @@ import Contact from "./pages/Contact"
 import Terms from "./pages/Terms"
 import Privacy from "./pages/Privacy"
 import Admin from "./pages/Admin"
+import Reset from "./pages/Reset"
 
 // Floating particles component
 const FloatingParticles = () => {
@@ -1013,6 +1014,7 @@ export default function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/reset" element={<Reset />} />
         <Route path="/services/meal-sharing-network" element={<MealSharing />} />
         <Route path="/services/rental-listings" element={<RentalListings />} />
         <Route path="/services/student-marketplace" element={<StudentMarketplace />} />
