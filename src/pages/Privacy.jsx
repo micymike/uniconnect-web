@@ -26,7 +26,7 @@ export default function Privacy() {
     <div className="min-h-screen font-sans bg-gradient-custom text-white overflow-x-hidden">
       
       {/* Scroll Progress Indicator */}
-<Footer />
+
       <div 
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-accent to-orange-600 z-50 transition-all duration-300"
         style={{ width: `${scrollWidth}%` }}
@@ -258,6 +258,7 @@ export default function Privacy() {
           </div>
         </div>
       </section>
+      <Footer />
 
       
 
