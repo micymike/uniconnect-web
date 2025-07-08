@@ -356,7 +356,14 @@ function HomePage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center hero-buttons">
             <MagneticButton 
               className="bg-accent hover:bg-accent-hover text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-accent/25 transition-all duration-500 transform hover:scale-105 glow-button"
-              comingSoon={true}
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                link.download = 'UniConnect.apk';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
             >
               <span className="flex items-center gap-2">
                 📱 Download App
@@ -632,7 +639,14 @@ function HomePage() {
                 </MagneticButton>
                 <MagneticButton 
                   className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg"
-                  comingSoon={true}
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                    link.download = 'UniConnect.apk';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
                 >
                   <span className="flex items-center gap-2">
                     🤖 Download for Android
@@ -723,7 +737,14 @@ function HomePage() {
             </p>
             <MagneticButton 
               className="bg-white text-accent hover:bg-gray-100 px-12 py-4 text-xl rounded-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl"
-              comingSoon={true}
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                link.download = 'UniConnect.apk';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
             >
               <span className="flex items-center gap-3">
                 🚀 Download UniConnect Now
