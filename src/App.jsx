@@ -7,6 +7,9 @@ import Privacy from "./pages/Privacy"
 import Admin from "./pages/Admin"
 import Reset from "./pages/Reset"
 import Footer from "./components/Footer"
+import SignIn from "./pages/SignIn"
+import SignUp from "./pages/SignUp"
+
 
 // Floating particles component
 const FloatingParticles = () => {
@@ -132,6 +135,8 @@ const TiltCard = ({ children, className }) => {
 }
 
 // Main landing page component
+import { useNavigate } from "react-router-dom";
+
 function HomePage() {
   const [isVisible, setIsVisible] = useState({
     hero: true,
@@ -145,6 +150,7 @@ function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [scrollProgress, setScrollProgress] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navigate = useNavigate();
   
   const problemRef = useRef(null)
   const featuresRef = useRef(null)
@@ -284,6 +290,9 @@ function HomePage() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
+              { text: "Sign In", path: "/signin" },
+              { text: "Sign Up", path: "/signup" },
+              { text: "Browse Rentals", path: "/services/rental-listings" }
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -367,6 +376,15 @@ function HomePage() {
             >
               <span className="flex items-center gap-2">
                 📱 Download App
+                <span className="animate-bounce">→</span>
+              </span>
+            </MagneticButton>
+            <MagneticButton
+              className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 text-lg rounded-xl shadow-2xl transition-all duration-500 transform hover:scale-105"
+              onClick={() => { navigate("/services/rental-listings"); }}
+            >
+              <span className="flex items-center gap-2">
+                🏠 Browse Rentals
                 <span className="animate-bounce">→</span>
               </span>
             </MagneticButton>
@@ -1005,9 +1023,13 @@ export default function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/reset" element={<Reset />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/services/meal-sharing-network" element={<MealSharing />} />
         <Route path="/services/rental-listings" element={<RentalListings />} />
         <Route path="/services/student-marketplace" element={<StudentMarketplace />} />
+        <Route path="/marketplace" element={<StudentMarketplace/>} />
+        <Route path="/rentals" element={<RentalListings />} />
       </Routes>
     </Router>
   )

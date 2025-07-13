@@ -135,6 +135,42 @@ export default function setupFeedbackApi(middlewares) {
       return res.end(JSON.stringify({ message: 'Analytics reset successfully' }));
     }
     
+    // GET /api/rentals - Get all rental properties
+    if (pathname === '/api/rentals' && req.method === 'GET') {
+      try {
+        const response = await fetch(`https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813961c00369dd87643/documents?queries[0]={"method":"limit","values":[100]}`, {
+          headers: {
+            'X-Appwrite-Project': '67fc0576000b05b9e495',
+            'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+          }
+        });
+        const data = await response.json();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true, data: data.documents }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    }
+    
+    // GET /api/rental-units - Get all rental units
+    if (pathname === '/api/rental-units' && req.method === 'GET') {
+      try {
+        const response = await fetch(`https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813965c0018e59b3f32/documents?queries[0]={"method":"limit","values":[100]}`, {
+          headers: {
+            'X-Appwrite-Project': '67fc0576000b05b9e495',
+            'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+          }
+        });
+        const data = await response.json();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true, data: data.documents }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    }
+    
     // Record visit for actual page views only
     if (!pathname.startsWith('/api/') && isActualPageView(pathname)) {
       recordVisit(req);

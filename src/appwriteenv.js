@@ -1,0 +1,20 @@
+export const Appwriteconfig = {
+    endpoint: "https://cloud.appwrite.io/v1",
+    platform : "com.uniconnect.x",
+    projectId: "67fc0576000b05b9e495",
+    databaseId: "67fc08930035410438a5",
+    api: "standard_5f7cc6073bb05307b3c0a27c80cd9ed3a8c204b1b25789a2feab31d0fa688af8ed4e017f249c7e46c5b870db543117fa3ecfa92224f6209170776841159d9282e46ec7000ec305af6a4c67e25f59578076e25b232643ce4c1221f6660cffc0a9910eb5b8603f1ec4e7ca3051475ad067081d4feaa3591a7afa555be1801f76db",
+    usercollectionId: "users",
+    businesscollectionId: "businesses",
+    rentalPropertiesCollectionId: "6813961c00369dd87643",
+    rentalUnitsCollectionId: "6813965c0018e59b3f32",
+    marketplaceCollectionId: "681743700002a53f71d3",
+    mealPostsCollectionId: "681887b9000bae23ae6a",
+    mealorderCollectionId: "6818b4950024845b5ea8",
+    verificationUrl: "https://egertonrentals.online",
+    messagesColletionId: "68282d7500169c311073",
+    chatroomCollectionId: "68282d8d001d8b708a6c",
+    imagesBacketId: "6838c6cc002160032c53",
+    // TODO: Replace with your actual notifications collection ID from Appwrite console
+    notificationsCollectionId: "YOUR_NOTIFICATIONS_COLLECTION_ID_HERE",
+};
