@@ -5,6 +5,11 @@ import Contact from "./pages/Contact"
 import Terms from "./pages/Terms"
 import Privacy from "./pages/Privacy"
 import Admin from "./pages/Admin"
+import Reset from "./pages/Reset"
+import Footer from "./components/Footer"
+import SignIn from "./pages/SignIn"
+import SignUp from "./pages/SignUp"
+
 
 // Floating particles component
 const FloatingParticles = () => {
@@ -130,6 +135,8 @@ const TiltCard = ({ children, className }) => {
 }
 
 // Main landing page component
+import { useNavigate } from "react-router-dom";
+
 function HomePage() {
   const [isVisible, setIsVisible] = useState({
     hero: true,
@@ -143,6 +150,7 @@ function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [scrollProgress, setScrollProgress] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navigate = useNavigate();
   
   const problemRef = useRef(null)
   const featuresRef = useRef(null)
@@ -282,6 +290,9 @@ function HomePage() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
+              { text: "Sign In", path: "/signin" },
+              { text: "Sign Up", path: "/signup" },
+              { text: "Browse Rentals", path: "/services/rental-listings" }
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -354,10 +365,26 @@ function HomePage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center hero-buttons">
             <MagneticButton 
               className="bg-accent hover:bg-accent-hover text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-accent/25 transition-all duration-500 transform hover:scale-105 glow-button"
-              comingSoon={true}
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                link.download = 'UniConnect.apk';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
             >
               <span className="flex items-center gap-2">
                 📱 Download App
+                <span className="animate-bounce">→</span>
+              </span>
+            </MagneticButton>
+            <MagneticButton
+              className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 text-lg rounded-xl shadow-2xl transition-all duration-500 transform hover:scale-105"
+              onClick={() => { navigate("/services/rental-listings"); }}
+            >
+              <span className="flex items-center gap-2">
+                🏠 Browse Rentals
                 <span className="animate-bounce">→</span>
               </span>
             </MagneticButton>
@@ -630,7 +657,14 @@ function HomePage() {
                 </MagneticButton>
                 <MagneticButton 
                   className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg"
-                  comingSoon={true}
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                    link.download = 'UniConnect.apk';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
                 >
                   <span className="flex items-center gap-2">
                     🤖 Download for Android
@@ -721,7 +755,14 @@ function HomePage() {
             </p>
             <MagneticButton 
               className="bg-white text-accent hover:bg-gray-100 px-12 py-4 text-xl rounded-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl"
-              comingSoon={true}
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                link.download = 'UniConnect.apk';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
             >
               <span className="flex items-center gap-3">
                 🚀 Download UniConnect Now
@@ -733,39 +774,7 @@ function HomePage() {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="py-10 px-4 bg-black border-t border-gray-800 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-6 md:mb-0">
-              <h3 className="text-2xl font-bold group cursor-pointer">
-                <span className="group-hover:animate-pulse text-white">Uni</span>
-                <span className="text-accent group-hover:text-orange-400 transition-colors duration-300">Connect</span>
-              </h3>
-            </div>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-              {[
-                { text: "Home", path: "/" },
-                { text: "About", path: "/about" },
-                { text: "Contact", path: "/contact" },
-                { text: "Terms", path: "/terms" },
-                { text: "Privacy", path: "/privacy" },
-              ].map((link) => (
-                <Link 
-                  to={link.path}
-                  key={link.text}
-                  className="relative text-gray-400 hover:text-accent transition-all duration-300 group cursor-pointer"
-                >
-                  {link.text}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-white">
-            <p>© {new Date().getFullYear()} UniConnect. All rights reserved. Made with ❤️ for students.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer className='m-24'/>
 
       <style>{`
         @keyframes float {
@@ -1013,9 +1022,14 @@ export default function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/reset" element={<Reset />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/services/meal-sharing-network" element={<MealSharing />} />
         <Route path="/services/rental-listings" element={<RentalListings />} />
         <Route path="/services/student-marketplace" element={<StudentMarketplace />} />
+        <Route path="/marketplace" element={<StudentMarketplace/>} />
+        <Route path="/rentals" element={<RentalListings />} />
       </Routes>
     </Router>
   )

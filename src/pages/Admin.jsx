@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
 
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -9,92 +10,160 @@ export default function Admin() {
   const [error, setError] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const [analytics, setAnalytics] = useState({ 
+    totalVisits: 0, 
+    uniqueVisitors: 0, 
+    pageViews: {},
+    lastReset: new Date().toISOString()
+  });
+
   // Check if user is already logged in
   useEffect(() => {
     const loggedIn = localStorage.getItem("adminLoggedIn");
     if (loggedIn === "true") {
       setIsLoggedIn(true);
       fetchFeedbacks();
+      fetchAnalytics();
     }
+    // eslint-disable-next-line
   }, []);
-  
+
   const handleLogin = (e) => {
     e.preventDefault();
     if (email === import.meta.env.VITE_APP_ADMIN_EMAIL && password === import.meta.env.VITE_APP_ADMIN_PASSWORD) {
       setIsLoggedIn(true);
-      localStorage.setItem("adminLoggedIn", "true"); 
+      localStorage.setItem("adminLoggedIn", "true");
       fetchFeedbacks();
+      fetchAnalytics();
     } else {
       setError("Invalid email or password");
     }
   };
-  
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     localStorage.removeItem("adminLoggedIn");
   };
-  
-  const fetchFeedbacks = () => {
-    const storedFeedbacks = localStorage.getItem("feedbacks");
-    if (storedFeedbacks) {
-      setFeedbacks(JSON.parse(storedFeedbacks));
+
+  // Fetch feedbacks from backend API
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await fetch("/api/feedback");
+      if (!response.ok) throw new Error("Failed to fetch feedbacks");
+      const data = await response.json();
+      setFeedbacks(data);
+    } catch (err) {
+      setFeedbacks([]);
     }
   };
   
-  const deleteFeedback = (index) => {
-    const updatedFeedbacks = [...feedbacks];
-    updatedFeedbacks.splice(index, 1);
-    setFeedbacks(updatedFeedbacks);
-    localStorage.setItem("feedbacks", JSON.stringify(updatedFeedbacks));
+  // Fetch analytics data
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch("/api/analytics");
+      if (!response.ok) throw new Error("Failed to fetch analytics");
+      const data = await response.json();
+      setAnalytics(data);
+    } catch (err) {
+      console.error("Error fetching analytics:", err);
+    }
+  };
+  
+  // Reset analytics data
+  const resetAnalytics = async () => {
+    try {
+      const response = await fetch("/api/analytics/reset", { method: "POST" });
+      if (!response.ok) throw new Error("Failed to reset analytics");
+      fetchAnalytics();
+    } catch (err) {
+      console.error("Error resetting analytics:", err);
+    }
+  };
+  
+  // Helper function to filter out development-related paths
+  const shouldFilterPage = (page) => {
+    const devPatterns = [
+      'node_modules', 
+      '@vite', 
+      '@react-refresh', 
+      '.jsx', 
+      '.js', 
+      '.css', 
+      '.mjs',
+      '?t='
+    ];
+    return devPatterns.some(pattern => page.includes(pattern));
+  };
+  
+  // Helper function to make page names more readable
+  const getPageName = (path) => {
+    if (path === '/') return 'Home';
     
-    // Update the JSON data for export
-    sessionStorage.setItem("latestFeedbackData", JSON.stringify(updatedFeedbacks, null, 2));
+    // Remove leading slash and capitalize
+    return path.substring(1)
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Delete feedback by id
+  const deleteFeedback = async (index) => {
+    const feedbackToDelete = feedbacks[index];
+    if (!feedbackToDelete || !feedbackToDelete.id) return;
+    try {
+      const response = await fetch(`/api/feedback/${feedbackToDelete.id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete feedback");
+      // Remove from UI
+      const updatedFeedbacks = feedbacks.filter((_, i) => i !== index);
+      setFeedbacks(updatedFeedbacks);
+    } catch (err) {
+      // Optionally show error
+    }
   };
   
   const exportToJson = () => {
     try {
       // Get the feedback data
       const jsonData = JSON.stringify(feedbacks, null, 2);
-      
+
       // Create a blob with the JSON data
       const blob = new Blob([jsonData], { type: "application/json" });
-      
+
       // Create a URL for the blob
       const url = URL.createObjectURL(blob);
-      
+
       // Create a link element
       const link = document.createElement("a");
       link.href = url;
       link.download = `uniconnect-feedback-${new Date().toISOString().split('T')[0]}.json`;
-      
+
       // Append the link to the body
       document.body.appendChild(link);
-      
+
       // Click the link to trigger the download
       link.click();
-      
+
       // Remove the link from the body
       document.body.removeChild(link);
-      
+
       // Release the URL
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting feedback data:", error);
     }
   };
-  
+
+  // Import from JSON (local only, does not update backend)
   const importFromJson = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const importedData = JSON.parse(e.target.result);
         setFeedbacks(importedData);
-        localStorage.setItem("feedbacks", JSON.stringify(importedData));
-        sessionStorage.setItem("latestFeedbackData", JSON.stringify(importedData, null, 2));
+        // Optionally, send to backend in bulk (not implemented)
       } catch (error) {
         console.error("Error importing feedback data:", error);
         alert("Invalid JSON file format");
@@ -105,47 +174,50 @@ export default function Admin() {
   
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen font-sans bg-gradient-custom text-white flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-darker to-dark p-8 rounded-xl border border-accent/20 w-full max-w-md">
-          <h1 className="text-3xl font-bold mb-6 text-center">Admin Login</h1>
-          {error && <div className="bg-red-500/20 text-red-300 p-3 rounded-md mb-4">{error}</div>}
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-white mb-2">Email</label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
-                placeholder="Enter admin email"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-white mb-2">Password</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
-                placeholder="Enter password"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-accent hover:bg-accent-hover text-white px-8 py-3 text-lg rounded-md button-hover"
-            >
-              Login
-            </button>
-          </form>
+      <>
+        <div className="min-h-screen font-sans bg-gradient-custom text-white flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-darker to-dark p-8 rounded-xl border border-accent/20 w-full max-w-md">
+            <h1 className="text-3xl font-bold mb-6 text-center">Admin Login</h1>
+            {error && <div className="bg-red-500/20 text-red-300 p-3 rounded-md mb-4">{error}</div>}
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-white mb-2">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
+                  placeholder="Enter admin email"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-white mb-2">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 bg-darker border border-accent/20 rounded-md text-white"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-accent hover:bg-accent-hover text-white px-8 py-3 text-lg rounded-md button-hover"
+              >
+                Login
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
-  
+
   return (
     <div className="min-h-screen font-sans bg-gradient-custom text-white">
       {/* Navigation */}
@@ -266,6 +338,57 @@ export default function Admin() {
               ))}
             </div>
           )}
+        </div>
+        
+        {/* Analytics Section */}
+        <div className="bg-gradient-to-br from-darker to-dark p-8 rounded-xl border border-accent/20 mt-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Site Analytics</h2>
+            <button
+              onClick={resetAnalytics}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md button-hover"
+            >
+              Reset Analytics
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-black/30 p-6 rounded-lg text-center">
+              <h3 className="text-accent text-lg mb-2">Total Visits</h3>
+              <p className="text-4xl font-bold">{analytics.totalVisits}</p>
+            </div>
+            
+            <div className="bg-black/30 p-6 rounded-lg text-center">
+              <h3 className="text-accent text-lg mb-2">Unique Visitors</h3>
+              <p className="text-4xl font-bold">{analytics.uniqueVisitors}</p>
+            </div>
+            
+            <div className="bg-black/30 p-6 rounded-lg text-center">
+              <h3 className="text-accent text-lg mb-2">Last Reset</h3>
+              <p className="text-sm">{new Date(analytics.lastReset).toLocaleString()}</p>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <h3 className="text-xl font-bold mb-4">Page Views</h3>
+            <div className="bg-black/30 p-4 rounded-lg">
+              {Object.entries(analytics.pageViews).length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(analytics.pageViews)
+                    .filter(([page]) => !shouldFilterPage(page))
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([page, count]) => (
+                      <div key={page} className="flex justify-between items-center border-b border-gray-700 py-2">
+                        <span className="text-gray-300">{getPageName(page)}</span>
+                        <span className="text-accent font-bold">{count}</span>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-gray-400">No page views recorded yet.</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

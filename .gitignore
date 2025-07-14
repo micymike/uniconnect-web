@@ -6,12 +6,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
+.env
 node_modules
 dist
 dist-ssr
 *.local
-
+src/uniconnect_mobile
+uniconnect_mobile
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -29,3 +30,4 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+src/uniconnect_mobile/notification-uniconnect-firebase-adminsdk-fbsvc-d7a8fb1bc6.json
