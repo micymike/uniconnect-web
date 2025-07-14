@@ -138,16 +138,24 @@ export default function setupFeedbackApi(middlewares) {
     // GET /api/rentals - Get all rental properties
     if (pathname === '/api/rentals' && req.method === 'GET') {
       try {
+        console.log('API Key available:', !!process.env.VITE_APPWRITE_API_KEY);
         const response = await fetch(`https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813961c00369dd87643/documents?queries[0]={"method":"limit","values":[100]}`, {
           headers: {
             'X-Appwrite-Project': '67fc0576000b05b9e495',
             'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
           }
         });
+        console.log('Rentals API response status:', response.status);
         const data = await response.json();
+        console.log('Rentals API data:', data);
+        
+        // Ensure we're returning an array of documents, even if empty
+        const documents = data.documents || [];
+        
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ success: true, data: data.documents }));
+        return res.end(JSON.stringify({ success: true, data: documents }));
       } catch (err) {
+        console.error('Rentals API error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, message: err.message }));
       }
@@ -162,10 +170,17 @@ export default function setupFeedbackApi(middlewares) {
             'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
           }
         });
+        console.log('Units API response status:', response.status);
         const data = await response.json();
+        console.log('Units API data:', data);
+        
+        // Ensure we're returning an array of documents, even if empty
+        const documents = data.documents || [];
+        
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ success: true, data: data.documents }));
+        return res.end(JSON.stringify({ success: true, data: documents }));
       } catch (err) {
+        console.error('Units API error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, message: err.message }));
       }

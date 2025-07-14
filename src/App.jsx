@@ -9,6 +9,13 @@ import Reset from "./pages/Reset"
 import Footer from "./components/Footer"
 import SignIn from "./pages/SignIn"
 import SignUp from "./pages/SignUp"
+import Profile from "./pages/Profile"
+import CreateBusiness from "./pages/CreateBusiness";
+import AddRental from "./pages/AddRental";
+import MyRentalsDashboard from "./pages/MyRentalsDashboard";
+import EditRental from "./pages/EditRental";
+// Placeholder component for add-product
+const AddProduct = () => <div style={{ color: "#fff", padding: 40 }}>Add Product (Coming Soon)</div>;
 
 
 // Floating particles component
@@ -292,7 +299,8 @@ function HomePage() {
               { text: "Privacy", path: "/privacy" },
               { text: "Sign In", path: "/signin" },
               { text: "Sign Up", path: "/signup" },
-              { text: "Browse Rentals", path: "/services/rental-listings" }
+              { text: "Browse Rentals", path: "/services/rental-listings" },
+              { text: "Profile", path: "/profile" }
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -316,6 +324,7 @@ function HomePage() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
+              { text: "Profile", path: "/profile" }
             ].map((link) => (
               <Link 
                 to={link.path}
@@ -1030,6 +1039,12 @@ export default function App() {
         <Route path="/services/student-marketplace" element={<StudentMarketplace />} />
         <Route path="/marketplace" element={<StudentMarketplace/>} />
         <Route path="/rentals" element={<RentalListings />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/add-product" element={<AddProduct />} />
+        <Route path="/add-rental" element={<AddRental />} />
+        <Route path="/createbusiness" element={<CreateBusiness />} />
+        <Route path="/my-rentals-dashboard" element={<MyRentalsDashboard />} />
+        <Route path="/edit-rental/:id" element={<EditRental />} />
       </Routes>
     </Router>
   )

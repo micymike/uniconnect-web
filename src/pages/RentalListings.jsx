@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { fetchRentals, fetchAllUnits } from "../api/rentals";
+import { Client, Databases, Query } from "appwrite";
+import { Appwriteconfig } from "../appwriteenv";
 import { getAuthData } from "../api/auth";
+import { getBusinessByUserId } from "../api/business";
+import { useNavigate } from "react-router-dom";
 
 // Color palette (from mobile)
 const COLORS = {
@@ -25,10 +28,27 @@ const POPULAR_SEARCHES = [
 
 function RentalCard({ unit, onClick }) {
   const property = unit.property || {};
-  const images = property.images && Array.isArray(property.images)
-    ? property.images
-    : (property.images ? JSON.parse(property.images) : []);
-  
+  // Robust image extraction: frontImage, backImage, images array (string or array)
+  let images = [];
+  if (property.frontImage && typeof property.frontImage === "string" && property.frontImage.trim() !== "") {
+    images.push(property.frontImage.trim());
+  }
+  if (property.backImage && typeof property.backImage === "string" && property.backImage.trim() !== "") {
+    images.push(property.backImage.trim());
+  }
+  if (property.images) {
+    if (Array.isArray(property.images)) {
+      images.push(...property.images.filter(img => typeof img === "string" && img.trim() !== ""));
+    } else if (typeof property.images === "string") {
+      try {
+        const parsed = JSON.parse(property.images);
+        if (Array.isArray(parsed)) {
+          images.push(...parsed.filter(img => typeof img === "string" && img.trim() !== ""));
+        }
+      } catch {}
+    }
+  }
+
   return (
     <div
       onClick={onClick}
@@ -154,7 +174,12 @@ function RentalCard({ unit, onClick }) {
             fontWeight: 700, 
             fontSize: 18
           }}>
-            Ksh. {unit.price ? Number(unit.price).toLocaleString() : "N/A"}
+            {(() => {
+              const price = unit.price || property.Price || property.price;
+              return price && !isNaN(Number(price))
+                ? `Ksh. ${Number(price).toLocaleString()}`
+                : "Ksh. N/A";
+            })()}
           </span>
         </div>
       </div>
@@ -170,7 +195,9 @@ export default function RentalListings() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [promotedData, setPromotedData] = useState([]);
+  const [hasBusiness, setHasBusiness] = useState(false);
   const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const { user, session } = getAuthData();
@@ -180,12 +207,41 @@ export default function RentalListings() {
     }
     setAuthChecking(false);
 
+    // Check if user has a business
+    getBusinessByUserId(user.$id).then((res) => {
+      setHasBusiness(res.success && !!res.business);
+    });
+
     async function loadData() {
       setLoading(true);
-      const [rentalRes, unitsRes] = await Promise.all([fetchRentals(), fetchAllUnits()]);
-      if (rentalRes.success && Array.isArray(rentalRes.data) && unitsRes.success && Array.isArray(unitsRes.data)) {
-        const verifiedProperties = rentalRes.data
-          .filter(({ isVerified }) => isVerified === true)
+      try {
+        // Initialize Appwrite client and databases
+        const client = new Client();
+        client
+          .setEndpoint(Appwriteconfig.endpoint)
+          .setProject(Appwriteconfig.projectId);
+        const databases = new Databases(client);
+
+        // Fetch rental properties and units directly from Appwrite
+        const [rentalRes, unitsRes] = await Promise.all([
+          databases.listDocuments(
+            Appwriteconfig.databaseId,
+            Appwriteconfig.rentalPropertiesCollectionId
+          ),
+          databases.listDocuments(
+            Appwriteconfig.databaseId,
+            Appwriteconfig.rentalUnitsCollectionId
+          )
+        ]);
+
+        const rentalData = rentalRes.documents || [];
+        const unitsData = unitsRes.documents || [];
+        
+        console.log('Rental properties found:', rentalData.length);
+        console.log('Rental units found:', unitsData.length);
+
+        // Process all properties regardless of whether units exist
+        const allProperties = rentalData
           .map((property) => {
             const images = [];
             if (property.frontImage && typeof property.frontImage === "string" && property.frontImage.trim() !== "") {
@@ -194,32 +250,72 @@ export default function RentalListings() {
             if (property.backImage && typeof property.backImage === "string" && property.backImage.trim() !== "") {
               images.push(property.backImage.trim());
             }
+            // If property.images exists and is a stringified array, merge
+            if (property.images && typeof property.images === "string") {
+              try {
+                const parsed = JSON.parse(property.images);
+                if (Array.isArray(parsed)) {
+                  images.push(...parsed.filter(img => typeof img === "string" && img.trim() !== ""));
+                }
+              } catch {}
+            }
             return {
               ...property,
               images
             };
           });
 
-        const verifiedPropertyIds = verifiedProperties.map(prop => prop.$id);
-        const verifiedUnits = unitsRes.data.filter(unit =>
-          verifiedPropertyIds.includes(unit.propertyId)
-        );
+        // Continue only if we have properties
+        if (allProperties.length > 0) {
+          const allPropertyIds = allProperties.map(prop => prop.$id);
 
-        const combined = verifiedUnits.map(unit => {
-          const parentProperty = verifiedProperties.find(prop => prop.$id === unit.propertyId);
-          return {
-            ...unit,
-            property: parentProperty || {}
-          };
-        });
+          // Filter units that have a valid propertyId
+          const allUnits = unitsData.filter(unit =>
+            allPropertyIds.includes(unit.propertyId)
+          );
 
-        // Promoted
-        const promoted = combined.filter(item => item.property?.isPromoted === true);
-        const shuffledPromoted = promoted.sort(() => 0.5 - Math.random()).slice(0, 3);
+          // Map units to their properties
+          let combined = [];
+          if (allUnits.length > 0) {
+            combined = allUnits.map(unit => {
+              const parentProperty = allProperties.find(prop => prop.$id === unit.propertyId);
+              return {
+                ...unit,
+                property: parentProperty || {}
+              };
+            });
+          }
 
-        setRentalUnits(combined);
-        setPromotedData(shuffledPromoted);
-      } else {
+          // Add placeholder units for properties that do not have any units
+          const propertyIdsWithUnits = new Set(allUnits.map(unit => unit.propertyId));
+          const propertiesWithoutUnits = allProperties.filter(
+            property => !propertyIdsWithUnits.has(property.$id)
+          );
+          const placeholderUnits = propertiesWithoutUnits.map(property => ({
+            $id: `temp-${property.$id}`,
+            propertyId: property.$id,
+            type: "Main Unit",
+            price: property.price || property.Price || "0",
+            vacancyStatus: true,
+            isFurnished: false,
+            property: property
+          }));
+
+          // Combine real units and placeholder units
+          combined = [...combined, ...placeholderUnits];
+
+          // Promoted
+          const promoted = combined.filter(item => item.property?.isPromoted === true);
+          const shuffledPromoted = promoted.sort(() => 0.5 - Math.random()).slice(0, Math.min(promoted.length, 3));
+
+          setRentalUnits(combined);
+          setPromotedData(shuffledPromoted);
+        } else {
+          setRentalUnits([]);
+          setPromotedData([]);
+        }
+      } catch (err) {
+        console.error('Failed to load rental data:', err);
         setRentalUnits([]);
         setPromotedData([]);
       }
@@ -289,37 +385,163 @@ export default function RentalListings() {
         margin: "16px 0 8px 0",
         display: "flex",
         gap: 12,
-        justifyContent: "center"
+        justifyContent: "center",
+        flexWrap: "wrap"
       }}>
-        <a
-          href="/rentals"
-          style={{
-            background: COLORS.accent,
-            color: "white",
-            padding: "10px 20px",
-            borderRadius: 8,
-            textDecoration: "none",
-            fontWeight: 600,
-            fontSize: 14
-          }}
-        >
-          🏠 Rentals
-        </a>
-        <a
-          href="/marketplace"
+        <button
+          onClick={() => navigate("/")}
           style={{
             background: COLORS.secondary,
             color: COLORS.white,
             padding: "10px 20px",
             borderRadius: 8,
-            textDecoration: "none",
             fontWeight: 600,
             fontSize: 14,
-            border: "1px solid #333"
+            border: "1px solid #333",
+            cursor: "pointer"
+          }}
+        >
+          Home
+        </button>
+        <button
+          onClick={() => navigate("/about")}
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+            cursor: "pointer"
+          }}
+        >
+          About
+        </button>
+        <button
+          onClick={() => navigate("/contact")}
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+            cursor: "pointer"
+          }}
+        >
+          Contact
+        </button>
+        <button
+          onClick={() => navigate("/terms")}
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+            cursor: "pointer"
+          }}
+        >
+          Terms
+        </button>
+        <button
+          onClick={() => navigate("/privacy")}
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+            cursor: "pointer"
+          }}
+        >
+          Privacy
+        </button>
+        <button
+          onClick={() => navigate("/profile")}
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+            cursor: "pointer"
+          }}
+        >
+          Profile
+        </button>
+        <button
+          onClick={() => navigate("/marketplace")}
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+            cursor: "pointer"
           }}
         >
           🛒 Marketplace
-        </a>
+        </button>
+        <button
+          onClick={() => navigate("/rentals")}
+          style={{
+            background: COLORS.accent,
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 14,
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          🏠 Rentals
+        </button>
+        {hasBusiness && (
+          <>
+            <button
+              onClick={() => navigate("/add-rental")}
+              style={{
+                background: "#4caf50",
+                color: "#fff",
+                padding: "10px 20px",
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: 14,
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              + Add Rental
+            </button>
+            <button
+              onClick={() => navigate("/my-rentals-dashboard")}
+              style={{
+                background: "#232526",
+                color: "#fff",
+                padding: "10px 20px",
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: 14,
+                border: "1px solid #333",
+                cursor: "pointer"
+              }}
+            >
+              My Dashboard
+            </button>
+          </>
+        )}
       </div>
 
       {/* Search Bar */}

@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { getAuthData } from "../api/auth";
 import { fetchAllProducts } from "../api/market";
 import { categories } from "../api/marketCategories";
+import { getBusinessByUserId } from "../api/business";
+import { useNavigate } from "react-router-dom";
 
 const COLORS = {
   background: "#000",
@@ -226,7 +228,9 @@ export default function StudentMarketplace() {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const [hasBusiness, setHasBusiness] = useState(false);
   const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const { user, session } = getAuthData();
@@ -234,6 +238,10 @@ export default function StudentMarketplace() {
       window.location.href = "/signin";
       return;
     }
+    // Check if user has a business
+    getBusinessByUserId(user.$id).then((res) => {
+      setHasBusiness(res.success && !!res.business);
+    });
     setLoading(true);
     async function loadData() {
       const productRes = await fetchAllProducts();
@@ -348,6 +356,39 @@ export default function StudentMarketplace() {
         >
           🛒 Marketplace
         </a>
+        <a
+          href="/profile"
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+          }}
+        >
+          👤 Profile
+        </a>
+        {hasBusiness && (
+          <button
+            onClick={() => navigate("/add-product")}
+            style={{
+              background: "#4caf50",
+              color: "#fff",
+              padding: "10px 20px",
+              borderRadius: 8,
+              fontWeight: 600,
+              fontSize: 14,
+              border: "none",
+              marginLeft: 8,
+              cursor: "pointer"
+            }}
+          >
+            + Add Product
+          </button>
+        )}
       </div>
 
       {/* Search Bar */}
