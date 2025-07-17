@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Client, Databases, Query } from "appwrite";
-import { Appwriteconfig } from "../appwriteenv";
+import { fetchRentals } from "../api/rentals";
 import { getAuthData } from "../api/auth";
 import { getBusinessByUserId } from "../api/business";
 import { useNavigate } from "react-router-dom";
@@ -215,99 +214,12 @@ export default function RentalListings() {
     async function loadData() {
       setLoading(true);
       try {
-        // Initialize Appwrite client and databases
-        const client = new Client();
-        client
-          .setEndpoint(Appwriteconfig.endpoint)
-          .setProject(Appwriteconfig.projectId);
-        const databases = new Databases(client);
-
-        // Fetch rental properties and units directly from Appwrite
-        const [rentalRes, unitsRes] = await Promise.all([
-          databases.listDocuments(
-            Appwriteconfig.databaseId,
-            Appwriteconfig.rentalPropertiesCollectionId
-          ),
-          databases.listDocuments(
-            Appwriteconfig.databaseId,
-            Appwriteconfig.rentalUnitsCollectionId
-          )
-        ]);
-
-        const rentalData = rentalRes.documents || [];
-        const unitsData = unitsRes.documents || [];
-        
-        console.log('Rental properties found:', rentalData.length);
-        console.log('Rental units found:', unitsData.length);
-
-        // Process all properties regardless of whether units exist
-        const allProperties = rentalData
-          .map((property) => {
-            const images = [];
-            if (property.frontImage && typeof property.frontImage === "string" && property.frontImage.trim() !== "") {
-              images.push(property.frontImage.trim());
-            }
-            if (property.backImage && typeof property.backImage === "string" && property.backImage.trim() !== "") {
-              images.push(property.backImage.trim());
-            }
-            // If property.images exists and is a stringified array, merge
-            if (property.images && typeof property.images === "string") {
-              try {
-                const parsed = JSON.parse(property.images);
-                if (Array.isArray(parsed)) {
-                  images.push(...parsed.filter(img => typeof img === "string" && img.trim() !== ""));
-                }
-              } catch {}
-            }
-            return {
-              ...property,
-              images
-            };
-          });
-
-        // Continue only if we have properties
-        if (allProperties.length > 0) {
-          const allPropertyIds = allProperties.map(prop => prop.$id);
-
-          // Filter units that have a valid propertyId
-          const allUnits = unitsData.filter(unit =>
-            allPropertyIds.includes(unit.propertyId)
-          );
-
-          // Map units to their properties
-          let combined = [];
-          if (allUnits.length > 0) {
-            combined = allUnits.map(unit => {
-              const parentProperty = allProperties.find(prop => prop.$id === unit.propertyId);
-              return {
-                ...unit,
-                property: parentProperty || {}
-              };
-            });
-          }
-
-          // Add placeholder units for properties that do not have any units
-          const propertyIdsWithUnits = new Set(allUnits.map(unit => unit.propertyId));
-          const propertiesWithoutUnits = allProperties.filter(
-            property => !propertyIdsWithUnits.has(property.$id)
-          );
-          const placeholderUnits = propertiesWithoutUnits.map(property => ({
-            $id: `temp-${property.$id}`,
-            propertyId: property.$id,
-            type: "Main Unit",
-            price: property.price || property.Price || "0",
-            vacancyStatus: true,
-            isFurnished: false,
-            property: property
-          }));
-
-          // Combine real units and placeholder units
-          combined = [...combined, ...placeholderUnits];
-
+        const result = await fetchRentals();
+        if (result.success && Array.isArray(result.data)) {
+          const combined = result.data;
           // Promoted
           const promoted = combined.filter(item => item.property?.isPromoted === true);
           const shuffledPromoted = promoted.sort(() => 0.5 - Math.random()).slice(0, Math.min(promoted.length, 3));
-
           setRentalUnits(combined);
           setPromotedData(shuffledPromoted);
         } else {

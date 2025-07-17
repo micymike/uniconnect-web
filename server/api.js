@@ -4,6 +4,61 @@ import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { parse } from 'url';
 import { recordVisit, getAnalytics, resetAnalytics } from './analytics.js';
+import webpush from 'web-push';
+
+const vapidKeys = {
+  publicKey: "BB8XZ16m7PDlgyWJwA5Db4e9UCShMcJmsjp1ma_Ef2WZMficbWuYU_p8UUE-dL25OYYdvNvSAYr1SPC-R2TqNK8",
+  privateKey: "SsDFed3Aub_jpFfJftiPzQfbrGzljLAHFnmhw4tpMEo"
+};
+
+webpush.setVapidDetails(
+  "mailto:admin@uniconnect.com",
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
+
+const pushSubsFile = path.join(path.dirname(fileURLToPath(import.meta.url)), '../data/push_subscriptions.json');
+
+function readPushSubs() {
+  try {
+    const data = fs.readFileSync(pushSubsFile, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    return [];
+  }
+}
+
+function writePushSubs(subs) {
+  fs.writeFileSync(pushSubsFile, JSON.stringify(subs, null, 2));
+}
+
+function addPushSub(sub) {
+  const subs = readPushSubs();
+  if (!subs.find(s => s.endpoint === sub.endpoint)) {
+    subs.push(sub);
+    writePushSubs(subs);
+  }
+}
+
+function removePushSub(endpoint) {
+  const subs = readPushSubs();
+  const filtered = subs.filter(s => s.endpoint !== endpoint);
+  writePushSubs(filtered);
+}
+
+async function sendPushToAll(payload) {
+  const subs = readPushSubs();
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(sub, JSON.stringify(payload));
+    } catch (err) {
+      // Remove invalid subscriptions
+      if (err.statusCode === 410 || err.statusCode === 404) {
+        removePushSub(sub.endpoint);
+      }
+    }
+  }
+}
 
 // Get the directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -62,12 +117,63 @@ async function parseBody(req) {
   });
 }
 
-// API routes handler for Vite middleware
+  // API routes handler for Vite middleware
 export default function setupFeedbackApi(middlewares) {
   middlewares.use(async (req, res, next) => {
     const parsedUrl = parse(req.url, true);
     const { pathname } = parsedUrl;
-    
+
+    // Register push subscription
+    if (pathname === '/api/push-subscribe' && req.method === 'POST') {
+      try {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        await new Promise(resolve => req.on('end', resolve));
+        const sub = JSON.parse(body);
+        addPushSub(sub);
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, error: 'Invalid subscription' }));
+      }
+    }
+
+    // Notify all subscribers of new house
+    if (pathname === '/api/notify-new-house' && req.method === 'POST') {
+      try {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        await new Promise(resolve => req.on('end', resolve));
+        const { title, url } = JSON.parse(body);
+        await sendPushToAll({
+          title: title || "New House Added!",
+          body: "A new house has just been listed. Check it out now.",
+          url: url || "/rentals"
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, error: 'Failed to send notification' }));
+      }
+    }
+
+    // Unregister push subscription
+    if (pathname === '/api/push-unsubscribe' && req.method === 'POST') {
+      try {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        await new Promise(resolve => req.on('end', resolve));
+        const { endpoint } = JSON.parse(body);
+        removePushSub(endpoint);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, error: 'Invalid request' }));
+      }
+    }
     // GET /api/feedback - Get all feedback
     if (pathname === '/api/feedback' && req.method === 'GET') {
       const feedbacks = readFeedbackData();
@@ -135,50 +241,128 @@ export default function setupFeedbackApi(middlewares) {
       return res.end(JSON.stringify({ message: 'Analytics reset successfully' }));
     }
     
-    // GET /api/rentals - Get all rental properties
+    // GET /api/rentals - Get all rental properties and units, combined
     if (pathname === '/api/rentals' && req.method === 'GET') {
       try {
-        console.log('API Key available:', !!process.env.VITE_APPWRITE_API_KEY);
-        const response = await fetch(`https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813961c00369dd87643/documents?queries[0]={"method":"limit","values":[100]}`, {
-          headers: {
-            'X-Appwrite-Project': '67fc0576000b05b9e495',
-            'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+        // Fetch all rental properties
+        const allProperties = [];
+        let hasMoreProps = true;
+        let cursorProps = null;
+        const batchSize = 100;
+        while (hasMoreProps) {
+          let url = `https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813961c00369dd87643/documents?limit=${batchSize}&orderField=$createdAt&orderType=DESC`;
+          if (cursorProps) {
+            url += `&cursor=${cursorProps}`;
           }
-        });
-        console.log('Rentals API response status:', response.status);
-        const data = await response.json();
-        console.log('Rentals API data:', data);
-        
-        // Ensure we're returning an array of documents, even if empty
-        const documents = data.documents || [];
-        
+          const response = await fetch(url, {
+            headers: {
+              'X-Appwrite-Project': '67fc0576000b05b9e495',
+              'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+            }
+          });
+          const data = await response.json();
+          const documents = data.documents || [];
+          allProperties.push(...documents);
+          if (documents.length === batchSize && documents[documents.length - 1]?.$id) {
+            cursorProps = documents[documents.length - 1].$id;
+          } else {
+            hasMoreProps = false;
+          }
+        }
+
+        // Fetch all rental units
+        const allUnits = [];
+        let hasMoreUnits = true;
+        let cursorUnits = null;
+        while (hasMoreUnits) {
+          let url = `https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813965c0018e59b3f32/documents?limit=${batchSize}&orderField=$createdAt&orderType=DESC`;
+          if (cursorUnits) {
+            url += `&cursor=${cursorUnits}`;
+          }
+          const response = await fetch(url, {
+            headers: {
+              'X-Appwrite-Project': '67fc0576000b05b9e495',
+              'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+            }
+          });
+          const data = await response.json();
+          const documents = data.documents || [];
+          allUnits.push(...documents);
+          if (documents.length === batchSize && documents[documents.length - 1]?.$id) {
+            cursorUnits = documents[documents.length - 1].$id;
+          } else {
+            hasMoreUnits = false;
+          }
+        }
+
+        // Combine units with their parent property
+        const allPropertyIds = allProperties.map(prop => prop.$id);
+        const unitsWithProperty = allUnits
+          .filter(unit => allPropertyIds.includes(unit.propertyId))
+          .map(unit => {
+            const parentProperty = allProperties.find(prop => prop.$id === unit.propertyId);
+            return {
+              ...unit,
+              property: parentProperty || {}
+            };
+          });
+
+        // Add placeholder units for properties that do not have any units
+        const propertyIdsWithUnits = new Set(allUnits.map(unit => unit.propertyId));
+        const propertiesWithoutUnits = allProperties.filter(
+          property => !propertyIdsWithUnits.has(property.$id)
+        );
+        const placeholderUnits = propertiesWithoutUnits.map(property => ({
+          $id: `temp-${property.$id}`,
+          propertyId: property.$id,
+          type: "Main Unit",
+          price: property.price || property.Price || "0",
+          vacancyStatus: true,
+          isFurnished: false,
+          property: property
+        }));
+
+        // Combine real units and placeholder units
+        const combined = [...unitsWithProperty, ...placeholderUnits];
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ success: true, data: documents }));
+        return res.end(JSON.stringify({ success: true, data: combined }));
       } catch (err) {
         console.error('Rentals API error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, message: err.message }));
       }
     }
-    
+
     // GET /api/rental-units - Get all rental units
     if (pathname === '/api/rental-units' && req.method === 'GET') {
       try {
-        const response = await fetch(`https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813965c0018e59b3f32/documents?queries[0]={"method":"limit","values":[100]}`, {
-          headers: {
-            'X-Appwrite-Project': '67fc0576000b05b9e495',
-            'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+        const allDocuments = [];
+        let hasMore = true;
+        let cursor = null;
+        const batchSize = 100;
+        while (hasMore) {
+          let url = `https://cloud.appwrite.io/v1/databases/67fc08930035410438a5/collections/6813965c0018e59b3f32/documents?limit=${batchSize}&orderField=$createdAt&orderType=DESC`;
+          if (cursor) {
+            url += `&cursor=${cursor}`;
           }
-        });
-        console.log('Units API response status:', response.status);
-        const data = await response.json();
-        console.log('Units API data:', data);
-        
-        // Ensure we're returning an array of documents, even if empty
-        const documents = data.documents || [];
-        
+          const response = await fetch(url, {
+            headers: {
+              'X-Appwrite-Project': '67fc0576000b05b9e495',
+              'X-Appwrite-Key': process.env.VITE_APPWRITE_API_KEY
+            }
+          });
+          const data = await response.json();
+          const documents = data.documents || [];
+          allDocuments.push(...documents);
+          if (documents.length === batchSize && documents[documents.length - 1]?.$id) {
+            cursor = documents[documents.length - 1].$id;
+          } else {
+            hasMore = false;
+          }
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ success: true, data: documents }));
+        return res.end(JSON.stringify({ success: true, data: allDocuments }));
       } catch (err) {
         console.error('Units API error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });

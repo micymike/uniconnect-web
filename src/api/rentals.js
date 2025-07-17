@@ -584,30 +584,18 @@ export async function uploadFile(file, type) {
     }
 }
 
-export async function createupload({frontImage: frontFile,backImage: backFile,title,description,location,latitude,longitude,agreed,managedBy,contactPhone}){
-  try{
-    // Upload files to Appwrite storage
-    const uploadPromises = [];
-    
-    if (frontFile) {
-      uploadPromises.push(storage.createFile(Appwriteconfig.imagesBacketId, ID.unique(), frontFile));
-    }
-    if (backFile) {
-      uploadPromises.push(storage.createFile(Appwriteconfig.imagesBacketId, ID.unique(), backFile));
-    }
-    
-    const uploadResults = await Promise.all(uploadPromises);
-    
-    // Generate URLs for uploaded files
-    const frontImageUrl = uploadResults[0] ? 
-      `https://cloud.appwrite.io/v1/storage/buckets/${Appwriteconfig.imagesBacketId}/files/${uploadResults[0].$id}/download?project=${Appwriteconfig.projectId}` : null;
-    const backImageUrl = uploadResults[1] ? 
-      `https://cloud.appwrite.io/v1/storage/buckets/${Appwriteconfig.imagesBacketId}/files/${uploadResults[1].$id}/download?project=${Appwriteconfig.projectId}` : null;
+export async function createupload({frontImage: frontFile, backImage: backFile, title, description, location, latitude, longitude, agreed, managedBy, contactPhone, price}) {
+  try {
+    // Upload files to Appwrite storage (web version)
+    const [frontImageUrl, backImageUrl] = await Promise.all([
+      frontFile ? uploadFile(frontFile, "image") : null,
+      backFile ? uploadFile(backFile, "image") : null
+    ]);
 
     const user = await account.get();
-    const userId = user.$id; 
+    const userId = user.$id;
 
-     const businessQuery = await databases.listDocuments(
+    const businessQuery = await databases.listDocuments(
       Appwriteconfig.databaseId,
       Appwriteconfig.businesscollectionId,
       [
@@ -617,7 +605,7 @@ export async function createupload({frontImage: frontFile,backImage: backFile,ti
 
     if (businessQuery.total === 0) {
       console.log("business not found for user.");
-      return {success: false, message: "Business not found for user"};
+      return { success: false, message: "Business not found for user" };
     }
 
     const businessId = businessQuery.documents[0].$id;
@@ -631,7 +619,7 @@ export async function createupload({frontImage: frontFile,backImage: backFile,ti
         businessId: businessId,
         frontImage: frontImageUrl,
         backImage: backImageUrl,
-        title : title,
+        title: title,
         description: description,
         location: location,
         latitude: latitude || "",
@@ -640,21 +628,25 @@ export async function createupload({frontImage: frontFile,backImage: backFile,ti
         contactPhone: contactPhone || "",
         agree: agreed,
         isPromoted: false,
-        isVerified: false,
-        Price: "" // Initialize Price attribute
-      }
-          
-    )
+        isVerified: true,
+        Price: typeof price !== "undefined" && price !== null ? String(price) : ""
+      },
+      [
+        "read(\"role:all\")",
+        "update(\"user:" + userId + "\")",
+        "delete(\"user:" + userId + "\")"
+      ]
+    );
     return {
-        success: true,
-        message: "Property listing created successfully.",
-        result: result,
-        $id: result.$id  // Add the $id directly to the top level for easier access
-      };
+      success: true,
+      message: "Property listing created successfully.",
+      result: result,
+      $id: result.$id
+    };
 
-  }catch(error){
-      console.error("Error in createupload:", error);
-      return {success: false, message: error.message || "Failed to create property listing"};
+  } catch (error) {
+    console.error("Error in createupload:", error);
+    return { success: false, message: error.message || "Failed to create property listing" };
   }
 }
 

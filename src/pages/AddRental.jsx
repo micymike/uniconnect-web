@@ -6,12 +6,17 @@ import { getBusinessByUserId } from "../api/business";
 
 export default function AddRental() {
   const [form, setForm] = useState({
-    name: "",
+    title: "",
     location: "",
     price: "",
     description: "",
     frontImage: null,
     backImage: null,
+    latitude: "",
+    longitude: "",
+    managedBy: "",
+    contactPhone: "",
+    agreed: false,
   });
   const [frontPreview, setFrontPreview] = useState(null);
   const [backPreview, setBackPreview] = useState(null);
@@ -49,19 +54,23 @@ export default function AddRental() {
   // Step validation
   const canNextStep = () => {
     if (step === 1) {
-      return form.name && form.location && form.price;
+      return form.title && form.location && form.price;
     }
     if (step === 2) {
-      return form.description;
+      return form.description && form.contactPhone && form.managedBy;
     }
     if (step === 3) {
-      return form.frontImage && form.backImage;
+      return form.frontImage && form.backImage && form.latitude && form.longitude && form.agreed;
     }
     return false;
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleFrontImageChange = (e) => {
@@ -106,27 +115,40 @@ export default function AddRental() {
       setLoading(false);
       return;
     }
+    if (!form.agreed) {
+      setError("You must agree to the rental listing terms before publishing your property.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Use the mobile version's createupload approach
       const rentalData = {
         frontImage: form.frontImage,
         backImage: form.backImage,
-        title: form.name,
+        title: form.title,
         description: form.description,
         location: form.location,
-        Price: form.price, // Save price as "Price" (capital P)
-        latitude: "",
-        longitude: "",
-        agreed: true,
-        managedBy: userId,
-        contactPhone: ""
+        Price: form.price,
+        price: form.price,
+        latitude: form.latitude,
+        longitude: form.longitude,
+        agreed: form.agreed,
+        managedBy: form.managedBy,
+        contactPhone: form.contactPhone,
       };
-      
+
       const result = await createupload(rentalData);
 
       if (result.success) {
         setSuccess("Rental property added!");
+        fetch("/api/notify-new-house", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: rentalData.title || "New House Added!",
+            url: "/rentals"
+          })
+        }).catch(() => {});
         setTimeout(() => {
           navigate("/rentals");
         }, 1200);
@@ -143,8 +165,8 @@ export default function AddRental() {
   // Stepper UI
   const steps = [
     { label: "Property Details" },
-    { label: "Description" },
-    { label: "Images & Review" },
+    { label: "Description & Contact" },
+    { label: "Images, Location & Review" },
   ];
 
   return (
@@ -188,16 +210,16 @@ export default function AddRental() {
             <>
               <div>
                 <label className="block text-white font-semibold mb-2">
-                  Property Name
+                  Property Title
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={form.name}
+                  name="title"
+                  value={form.title}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition"
-                  placeholder="e.g. Cozy Bedsitter"
+                  placeholder="e.g. Cozy 2-bedroom in Egerton"
                 />
               </div>
               <div>
@@ -232,20 +254,54 @@ export default function AddRental() {
             </>
           )}
           {step === 2 && (
-            <div className="mb-8">
-              <label className="block text-white font-semibold mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                required
-                rows={5}
-                className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition resize-vertical"
-                placeholder="Describe the property, amenities, etc."
-              />
-            </div>
+            <>
+              <div className="mb-8">
+                <label className="block text-white font-semibold mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  required
+                  rows={5}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition resize-vertical"
+                  placeholder="Describe the property, amenities, etc."
+                />
+              </div>
+              <div className="mb-8">
+                <label className="block text-white font-semibold mb-2">
+                  Contact Phone
+                </label>
+                <input
+                  type="text"
+                  name="contactPhone"
+                  value={form.contactPhone}
+                  onChange={handleChange}
+                  required
+                  minLength={9}
+                  maxLength={15}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition"
+                  placeholder="e.g. 712345678"
+                />
+              </div>
+              <div className="mb-8">
+                <label className="block text-white font-semibold mb-2">
+                  Managed By
+                </label>
+                <select
+                  name="managedBy"
+                  value={form.managedBy}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition"
+                >
+                  <option value="">Select</option>
+                  <option value="Landlord/Landlady">Landlord/Landlady</option>
+                  <option value="Agent">Agent</option>
+                </select>
+              </div>
+            </>
           )}
           {step === 3 && (
             <>
@@ -343,11 +399,54 @@ export default function AddRental() {
                   Tip: Include clear photos of the front and back of your property.
                 </p>
               </div>
+              <div className="mb-8 flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-white font-semibold mb-2">
+                    Latitude
+                  </label>
+                  <input
+                    type="text"
+                    name="latitude"
+                    value={form.latitude}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition"
+                    placeholder="-1.3625416878306622"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-white font-semibold mb-2">
+                    Longitude
+                  </label>
+                  <input
+                    type="text"
+                    name="longitude"
+                    value={form.longitude}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-accent transition"
+                    placeholder="36.65722939768087"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  name="agreed"
+                  checked={form.agreed}
+                  onChange={handleChange}
+                  className="mr-2"
+                  required
+                />
+                <span className="text-white text-sm">
+                  I agree to the <span className="font-bold">rental listing terms</span> and confirm that this property listing complies with all rental policies and that the information provided is accurate, truthful, and up to date.
+                </span>
+              </div>
               <div className="bg-white/5 rounded-lg p-4 mt-4">
                 <h3 className="text-lg font-semibold text-accent mb-2">Review Details</h3>
                 <ul className="text-white space-y-1">
                   <li>
-                    <span className="font-semibold">Name:</span> {form.name}
+                    <span className="font-semibold">Title:</span> {form.title}
                   </li>
                   <li>
                     <span className="font-semibold">Location:</span> {form.location}
@@ -359,12 +458,28 @@ export default function AddRental() {
                     <span className="font-semibold">Description:</span> {form.description}
                   </li>
                   <li>
+                    <span className="font-semibold">Contact Phone:</span> {form.contactPhone}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Managed By:</span> {form.managedBy}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Latitude:</span> {form.latitude}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Longitude:</span> {form.longitude}
+                  </li>
+                  <li>
                     <span className="font-semibold">Front Image:</span>{" "}
                     {frontPreview ? "Selected" : "None"}
                   </li>
                   <li>
                     <span className="font-semibold">Back Image:</span>{" "}
                     {backPreview ? "Selected" : "None"}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Agreed to Terms:</span>{" "}
+                    {form.agreed ? "Yes" : "No"}
                   </li>
                 </ul>
               </div>
