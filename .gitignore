@@ -31,3 +31,4 @@ uniconnect_mobile
 .env.test.local
 .env.production.local
 src/uniconnect_mobile/notification-uniconnect-firebase-adminsdk-fbsvc-d7a8fb1bc6.json
+uniconnect/app.json
