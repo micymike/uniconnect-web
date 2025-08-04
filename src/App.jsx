@@ -376,7 +376,7 @@ function HomePage() {
               className="bg-accent hover:bg-accent-hover text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-accent/25 transition-all duration-500 transform hover:scale-105 glow-button"
               onClick={() => {
                 const link = document.createElement('a');
-                link.href = 'https://expo.dev/artifacts/0285c058-f2e1-431e-94b7-caccfcf7086d';
+                link.href = 'https://play.google.com/store/apps/details?id=com.uniconnect.pro&pcampaignid=web_share';
                 link.download = 'UniConnect.apk';
                 document.body.appendChild(link);
                 link.click();
@@ -668,7 +668,7 @@ function HomePage() {
                   className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg"
                   onClick={() => {
                     const link = document.createElement('a');
-                    link.href = 'https://expo.dev/artifacts/0285c058-f2e1-431e-94b7-caccfcf7086d';
+                    link.href = 'https://play.google.com/store/apps/details?id=com.uniconnect.pro&pcampaignid=web_share';
                     link.download = 'UniConnect.apk';
                     document.body.appendChild(link);
                     link.click();
@@ -766,7 +766,7 @@ function HomePage() {
               className="bg-white text-accent hover:bg-gray-100 px-12 py-4 text-xl rounded-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl"
               onClick={() => {
                 const link = document.createElement('a');
-                link.href = 'https://expo.dev/artifacts/0285c058-f2e1-431e-94b7-caccfcf7086d';
+                link.href = 'https://play.google.com/store/apps/details?id=com.uniconnect.pro&pcampaignid=web_share';
                 link.download = 'UniConnect.apk';
                 document.body.appendChild(link);
                 link.click();
