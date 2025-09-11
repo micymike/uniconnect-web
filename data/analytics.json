@@ -1,25 +1,26 @@
 {
-  "totalVisits": 222,
+  "totalVisits": 235,
   "uniqueVisitors": 1,
   "uniqueVisitorIps": "127.0.0.1",
   "pageViews": {
     "/about": 1,
     "/hybridaction/zybTrackerStatisticsAction": 6,
     "/admin": 10,
-    "/": 63,
+    "/": 64,
     "/reset": 1,
     "/services/meal-sharing-network": 1,
     "/contact": 6,
     "/terms": 2,
     "/services/rental-listings": 20,
-    "/signin": 27,
+    "/signin": 34,
     "/rentals": 46,
     "/marketplace": 11,
     "/profile": 4,
     "/createbusiness": 3,
     "/add-rental": 14,
     "/my-rentals-dashboard": 5,
-    "/edit-rental/6873f3a40000dcea2544": 2
+    "/edit-rental/6873f3a40000dcea2544": 2,
+    "/services/student-marketplace": 5
   },
   "lastReset": "2025-06-08T17:48:28.067Z"
 }
