@@ -9,6 +9,12 @@ import Reset from "./pages/Reset"
 import Footer from "./components/Footer"
 import SignIn from "./pages/SignIn"
 import SignUp from "./pages/SignUp"
+import RentalListings from "./pages/RentalListings"
+import RentalDashboard from "./pages/RentalDashboard"
+import CreateProperty from "./pages/CreateProperty"
+import StudentMarketplace from "./pages/StudentMarketplace"
+import MarketplaceDashboard from "./pages/MarketplaceDashboard"
+import MealSharing from "./pages/MealSharing"
 
 
 // Floating particles component
@@ -292,7 +298,8 @@ function HomePage() {
               { text: "Privacy", path: "/privacy" },
               { text: "Sign In", path: "/signin" },
               { text: "Sign Up", path: "/signup" },
-              { text: "Browse Rentals", path: "/services/rental-listings" }
+              { text: "Browse Rentals", path: "/services/rental-listings" },
+              { text: "Rental Dashboard", path: "/rental-dashboard" }
             ].map((link, index) => (
               <Link 
                 to={link.path}
@@ -1006,10 +1013,7 @@ function HomePage() {
 }
 
 
-// Service pages
-import MealSharing from "./pages/MealSharing"
-import RentalListings from "./pages/RentalListings"
-import StudentMarketplace from "./pages/StudentMarketplace"
+
 
 // Main App component with routing
 export default function App() {
@@ -1029,7 +1033,10 @@ export default function App() {
         <Route path="/services/rental-listings" element={<RentalListings />} />
         <Route path="/services/student-marketplace" element={<StudentMarketplace />} />
         <Route path="/marketplace" element={<StudentMarketplace/>} />
+        <Route path="/marketplace-dashboard" element={<MarketplaceDashboard />} />
         <Route path="/rentals" element={<RentalListings />} />
+        <Route path="/rental-dashboard" element={<RentalDashboard />} />
+        <Route path="/create-property" element={<CreateProperty />} />
       </Routes>
     </Router>
   )

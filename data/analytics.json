@@ -1,20 +1,21 @@
 {
-  "totalVisits": 130,
+  "totalVisits": 266,
   "uniqueVisitors": 1,
   "uniqueVisitorIps": "127.0.0.1",
   "pageViews": {
     "/about": 1,
-    "/hybridaction/zybTrackerStatisticsAction": 6,
+    "/hybridaction/zybTrackerStatisticsAction": 120,
     "/admin": 10,
-    "/": 55,
+    "/": 62,
     "/reset": 1,
     "/services/meal-sharing-network": 1,
     "/contact": 6,
     "/terms": 2,
     "/services/rental-listings": 13,
     "/signin": 22,
-    "/rentals": 7,
-    "/marketplace": 6
+    "/rentals": 11,
+    "/marketplace": 14,
+    "/marketplace-dashboard": 3
   },
   "lastReset": "2025-06-08T17:48:28.067Z"
 }

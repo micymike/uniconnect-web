@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { fetchRentals, fetchAllUnits } from "../api/rentals";
 import { getAuthData } from "../api/auth";
+import RentalUnitDetail from "./RentalUnitDetail";
 
 // Color palette (from mobile)
 const COLORS = {
@@ -170,6 +171,8 @@ export default function RentalListings() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [promotedData, setPromotedData] = useState([]);
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [showUnitDetail, setShowUnitDetail] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -449,7 +452,14 @@ export default function RentalListings() {
             marginBottom: 20
           }}>
             {promotedData.map(unit => (
-              <RentalCard key={unit.$id} unit={unit} />
+              <RentalCard 
+                key={unit.$id} 
+                unit={unit} 
+                onClick={() => {
+                  setSelectedUnitId(unit.$id);
+                  setShowUnitDetail(true);
+                }}
+              />
             ))}
           </div>
         )}
@@ -479,7 +489,14 @@ export default function RentalListings() {
               gap: 20
             }}>
               {searchResults.map(unit => (
-                <RentalCard key={unit.$id} unit={unit} />
+                <RentalCard 
+                  key={unit.$id} 
+                  unit={unit} 
+                  onClick={() => {
+                    setSelectedUnitId(unit.$id);
+                    setShowUnitDetail(true);
+                  }}
+                />
               ))}
             </div>
           )
@@ -498,12 +515,28 @@ export default function RentalListings() {
               gap: 20
             }}>
               {filteredUnits.map(unit => (
-                <RentalCard key={unit.$id} unit={unit} />
+                <RentalCard 
+                  key={unit.$id} 
+                  unit={unit} 
+                  onClick={() => {
+                    setSelectedUnitId(unit.$id);
+                    setShowUnitDetail(true);
+                  }}
+                />
               ))}
             </div>
           )
         ))}
       </div>
+
+      <RentalUnitDetail
+        unitId={selectedUnitId}
+        isOpen={showUnitDetail}
+        onClose={() => {
+          setShowUnitDetail(false);
+          setSelectedUnitId(null);
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getAuthData } from "../api/auth";
 import { fetchAllProducts } from "../api/market";
 import { categories } from "../api/marketCategories";
+import ProductDetail from "./ProductDetail";
 
 const COLORS = {
   background: "#000",
@@ -16,7 +17,7 @@ const COLORS = {
   badge: "#2a1205",
 };
 
-function ProductCard({ product }) {
+function ProductCard({ product, onClick }) {
   // Use frontImage, backImage, or image
   const image =
     product.frontImage ||
@@ -26,7 +27,7 @@ function ProductCard({ product }) {
 
   return (
     <div
-      key={product.$id}
+      onClick={onClick}
       style={{
         background: COLORS.card,
         borderRadius: 16,
@@ -226,6 +227,8 @@ export default function StudentMarketplace() {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [showProductDetail, setShowProductDetail] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -347,6 +350,21 @@ export default function StudentMarketplace() {
           }}
         >
           🛒 Marketplace
+        </a>
+        <a
+          href="/marketplace-dashboard"
+          style={{
+            background: COLORS.secondary,
+            color: COLORS.white,
+            padding: "10px 20px",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: 14,
+            border: "1px solid #333",
+          }}
+        >
+          📊 My Products
         </a>
       </div>
 
@@ -551,7 +569,14 @@ export default function StudentMarketplace() {
               }}
             >
               {searchResults.map((product) => (
-                <ProductCard key={product.$id} product={product} />
+                <ProductCard 
+                  key={product.$id} 
+                  product={product} 
+                  onClick={() => {
+                    setSelectedProductId(product.$id);
+                    setShowProductDetail(true);
+                  }}
+                />
               ))}
             </div>
           )
@@ -580,11 +605,27 @@ export default function StudentMarketplace() {
             }}
           >
             {allProducts.map((product) => (
-              <ProductCard key={product.$id} product={product} />
+              <ProductCard 
+                key={product.$id} 
+                product={product} 
+                onClick={() => {
+                  setSelectedProductId(product.$id);
+                  setShowProductDetail(true);
+                }}
+              />
             ))}
           </div>
         )}
       </div>
+
+      <ProductDetail
+        productId={selectedProductId}
+        isOpen={showProductDetail}
+        onClose={() => {
+          setShowProductDetail(false);
+          setSelectedProductId(null);
+        }}
+      />
     </div>
   );
 }
