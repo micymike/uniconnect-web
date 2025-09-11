@@ -323,6 +323,7 @@ function HomePage() {
               { text: "Contact", path: "/contact" },
               { text: "Terms", path: "/terms" },
               { text: "Privacy", path: "/privacy" },
+              { text: "Profile", path: "/profile" }
             ].map((link) => (
               <Link 
                 to={link.path}
@@ -374,7 +375,7 @@ function HomePage() {
               className="bg-accent hover:bg-accent-hover text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-accent/25 transition-all duration-500 transform hover:scale-105 glow-button"
               onClick={() => {
                 const link = document.createElement('a');
-                link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                link.href = 'https://play.google.com/store/apps/details?id=com.uniconnect.pro&pcampaignid=web_share';
                 link.download = 'UniConnect.apk';
                 document.body.appendChild(link);
                 link.click();
@@ -666,7 +667,7 @@ function HomePage() {
                   className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl transition-all duration-500 transform hover:scale-105 shadow-lg"
                   onClick={() => {
                     const link = document.createElement('a');
-                    link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                    link.href = 'https://play.google.com/store/apps/details?id=com.uniconnect.pro&pcampaignid=web_share';
                     link.download = 'UniConnect.apk';
                     document.body.appendChild(link);
                     link.click();
@@ -764,7 +765,7 @@ function HomePage() {
               className="bg-white text-accent hover:bg-gray-100 px-12 py-4 text-xl rounded-xl font-bold transition-all duration-500 transform hover:scale-110 shadow-2xl"
               onClick={() => {
                 const link = document.createElement('a');
-                link.href = 'https://expo.dev/artifacts/eas/8292fc1b-0045-4bf6-a47f-99dc59a41d18.apk';
+                link.href = 'https://play.google.com/store/apps/details?id=com.uniconnect.pro&pcampaignid=web_share';
                 link.download = 'UniConnect.apk';
                 document.body.appendChild(link);
                 link.click();
@@ -1017,8 +1018,77 @@ function HomePage() {
 
 // Main App component with routing
 export default function App() {
+  const [pushEnabled, setPushEnabled] = useState(false);
+
+  useEffect(() => {
+    isPushSubscribed().then(setPushEnabled);
+  }, []);
+
+  const handleEnablePush = async () => {
+    try {
+      await subscribeUserToPush();
+      setPushEnabled(true);
+      alert("Push notifications enabled!");
+    } catch (e) {
+      alert("Failed to enable notifications: " + e.message);
+    }
+  };
+
+  const [showBanner, setShowBanner] = useState(true);
+
   return (
     <Router>
+      {!pushEnabled && showBanner && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            zIndex: 9999,
+            background: "#ff6600",
+            color: "#fff",
+            padding: "16px 0",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+          }}
+        >
+          <span style={{ fontWeight: "bold", marginRight: 16 }}>
+            Enable browser notifications for important updates.
+          </span>
+          <button
+            onClick={handleEnablePush}
+            style={{
+              background: "#fff",
+              color: "#ff6600",
+              border: "none",
+              borderRadius: "6px",
+              padding: "8px 16px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              marginRight: 8
+            }}
+          >
+            Enable Notifications
+          </button>
+          <button
+            onClick={() => setShowBanner(false)}
+            style={{
+              background: "transparent",
+              color: "#fff",
+              border: "none",
+              fontSize: "20px",
+              cursor: "pointer"
+            }}
+            aria-label="Dismiss"
+            title="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />

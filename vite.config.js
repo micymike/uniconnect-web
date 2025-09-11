@@ -15,6 +15,6 @@ export default defineConfig({
   ],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['www.uniconnect.store']
+    allowedHosts: ['www.uniconnect.store', 'uniconnect-web-niey.onrender.com','https://uniconnect-web-fsm9.onrender.com', 'uniconnect-web-fsm9.onrender.com'],
   }
 })

@@ -29,13 +29,251 @@ export async function fetchRentals() {
     );
     return { success: true, data: res.documents };
   } catch (err) {
-    console.error("fetchRentals error:", err);
-    return { success: false, message: err.message };
+    console.error("Error ensuring condition attribute:", err);
   }
 }
 
-// Fetch all rental units
+
+export async function fetchRentals() {
+  try {
+    const response = await fetch('/api/rentals');
+    if (response.status === 401) {
+      window.location.href = '/signin';
+      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
+    }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    // Ensure data.data is always an array
+    if (data.success && !data.data) {
+      data.data = [];
+    }
+    
+    return data;
+  } catch (error) {
+    if (error?.message?.toLowerCase().includes("401") || error?.message?.toLowerCase().includes("unauthoriz")) {
+      window.location.href = '/signin';
+      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
+    }
+    console.error('Error fetching rentals:', error);
+    return { success: false, message: error.message, data: [] };
+  }
+}
+
 export async function fetchAllUnits() {
+  try {
+    const response = await fetch('/api/rental-units');
+    if (response.status === 401) {
+      window.location.href = '/signin';
+      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
+    }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    // Ensure data.data is always an array
+    if (data.success && !data.data) {
+      data.data = [];
+    }
+    
+    return data;
+  } catch (error) {
+    if (error?.message?.toLowerCase().includes("401") || error?.message?.toLowerCase().includes("unauthoriz")) {
+      window.location.href = '/signin';
+      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
+    }
+    console.error('Error fetching units:', error);
+    return { success: false, message: error.message, data: [] };
+  }
+}
+
+export const getUnitWithProperty = async (unitId) => {
+  try {
+    const unit = await databases.getDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalUnitsCollectionId,
+      unitId
+    );
+
+    if (!unit || !unit.propertyId) {
+      return { success: false, message: "Unit or propertyId not found" };
+    }
+
+    const property = await databases.getDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalPropertiesCollectionId,
+      unit.propertyId
+    );
+
+    return {
+      success: true,
+      unit,
+      property,
+    };
+
+  } catch (error) {
+    return {success: false,};
+    throw error;
+  }
+};
+
+export async function getRentalUnitById(unitId) {
+    try {
+        
+    const unitRes = await databases.getDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalUnitsCollectionId,
+      unitId
+    );
+
+    const rentalUnit = unitRes;
+
+    const propertyRes = await databases.getDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalPropertiesCollectionId,
+      rentalUnit.propertyId
+    );
+
+    return {
+      success: true,
+      data: {
+        ...rentalUnit,
+        property: propertyRes
+      }
+    };
+
+  } catch (error) {
+    console.error("Error fetching rental unit:", error);
+    return {
+      success: false,
+      message: "Failed to fetch rental unit",
+      error
+    };
+  }
+}
+export async function readOneUnit(id){
+    try{
+        const result = await databases.getDocument(
+            Appwriteconfig.databaseId,
+            Appwriteconfig.rentalUnitsCollectionId,
+            id
+        )
+
+        return {success: true,result: result}
+
+    }catch(error){
+        return {success: false,};
+        throw error;
+    }
+}
+
+export async function updateOneUnit(id, data) {
+  try {
+    const result = await databases.updateDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalUnitsCollectionId,
+      id,
+      data
+    );
+    return {success: true,result};
+  } catch (error) {
+    return {success: false,};
+    throw error;
+  }
+}
+
+export async function deletePropertyUnit(propertyId) {
+  try {
+    const existingListing = await databases.getDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalPropertiesCollectionId,
+      propertyId
+    );
+
+    const units = await databases.listDocuments(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalUnitsCollectionId,
+      [Query.equal("propertyId", propertyId)]
+    );
+
+    for (const unit of units.documents) {
+      await databases.deleteDocument(
+        Appwriteconfig.databaseId,
+        Appwriteconfig.rentalUnitsCollectionId,
+        unit.$id
+      );
+    }
+
+    await databases.deleteDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalPropertiesCollectionId,
+      propertyId
+    );
+
+    const extractFileId = (fileUrl) => {
+      if (!fileUrl) return null;
+      const match = fileUrl.match(/\/files\/([^/]+)\//);
+      return match ? match[1] : null;
+    };
+
+    const fileIds = [
+      extractFileId(existingListing.frontImage),
+      extractFileId(existingListing.backImage),
+    ].filter(Boolean);
+
+    await Promise.all(
+      fileIds.map(async (fileId) => {
+        try {
+          await storage.deleteFile(Appwriteconfig.imagesBacketId, fileId);
+          console.log(`Deleted image: ${fileId}`);
+        } catch (deleteError) {
+          console.error(`Error deleting image ${fileId}:`, deleteError);
+        }
+      })
+    );
+
+    return {success: true};
+
+  } catch (error) {
+    return {success: false};
+    throw error; 
+  }
+}
+
+
+export async function deleteUnit(unitId) {
+  try {
+    await databases.deleteDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalUnitsCollectionId,
+      unitId
+    );
+    console.log("Unit deleted successfully.");
+    return {success: true};
+  } catch (error) {
+    return {success: false,};
+    throw error;
+  }
+}
+
+export async function fetchRentalById(id) {
+  try {
+    const doc = await databases.getDocument(
+      Appwriteconfig.databaseId,
+      Appwriteconfig.rentalPropertiesCollectionId,
+      id
+    );
+    return { success: true, data: doc };
+  } catch (error) {
+    return {success: false,};
+    throw error;
+  }
+}
+
+export async function getPropertyTypes() {
   try {
     const res = await databases.listDocuments(
       config.databaseId,

@@ -230,6 +230,7 @@ export default function StudentMarketplace() {
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [showProductDetail, setShowProductDetail] = useState(false);
   const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const { user, session } = getAuthData();
@@ -237,6 +238,10 @@ export default function StudentMarketplace() {
       window.location.href = "/signin";
       return;
     }
+    // Check if user has a business
+    getBusinessByUserId(user.$id).then((res) => {
+      setHasBusiness(res.success && !!res.business);
+    });
     setLoading(true);
     async function loadData() {
       const productRes = await fetchAllProducts();
