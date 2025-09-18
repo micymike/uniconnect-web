@@ -34,61 +34,9 @@ export async function fetchRentals() {
 }
 
 
-export async function fetchRentals() {
-  try {
-    const response = await fetch('/api/rentals');
-    if (response.status === 401) {
-      window.location.href = '/signin';
-      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
-    }
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    
-    // Ensure data.data is always an array
-    if (data.success && !data.data) {
-      data.data = [];
-    }
-    
-    return data;
-  } catch (error) {
-    if (error?.message?.toLowerCase().includes("401") || error?.message?.toLowerCase().includes("unauthoriz")) {
-      window.location.href = '/signin';
-      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
-    }
-    console.error('Error fetching rentals:', error);
-    return { success: false, message: error.message, data: [] };
-  }
-}
 
-export async function fetchAllUnits() {
-  try {
-    const response = await fetch('/api/rental-units');
-    if (response.status === 401) {
-      window.location.href = '/signin';
-      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
-    }
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    
-    // Ensure data.data is always an array
-    if (data.success && !data.data) {
-      data.data = [];
-    }
-    
-    return data;
-  } catch (error) {
-    if (error?.message?.toLowerCase().includes("401") || error?.message?.toLowerCase().includes("unauthoriz")) {
-      window.location.href = '/signin';
-      return { success: false, message: "Unauthorized. Redirecting to login.", data: [] };
-    }
-    console.error('Error fetching units:', error);
-    return { success: false, message: error.message, data: [] };
-  }
-}
+
+
 
 export const getUnitWithProperty = async (unitId) => {
   try {
@@ -120,40 +68,7 @@ export const getUnitWithProperty = async (unitId) => {
   }
 };
 
-export async function getRentalUnitById(unitId) {
-    try {
-        
-    const unitRes = await databases.getDocument(
-      Appwriteconfig.databaseId,
-      Appwriteconfig.rentalUnitsCollectionId,
-      unitId
-    );
 
-    const rentalUnit = unitRes;
-
-    const propertyRes = await databases.getDocument(
-      Appwriteconfig.databaseId,
-      Appwriteconfig.rentalPropertiesCollectionId,
-      rentalUnit.propertyId
-    );
-
-    return {
-      success: true,
-      data: {
-        ...rentalUnit,
-        property: propertyRes
-      }
-    };
-
-  } catch (error) {
-    console.error("Error fetching rental unit:", error);
-    return {
-      success: false,
-      message: "Failed to fetch rental unit",
-      error
-    };
-  }
-}
 export async function readOneUnit(id){
     try{
         const result = await databases.getDocument(
@@ -424,7 +339,7 @@ export async function updateUnit(unitId, data) {
 }
 
 // Delete rental unit
-export async function deleteUnit(unitId) {
+/* export async function deleteUnit(unitId) {
   try {
     await databases.deleteDocument(
       config.databaseId,
@@ -436,7 +351,7 @@ export async function deleteUnit(unitId) {
     console.error("Error deleting rental unit:", error);
     return { success: false, message: error?.message || "Failed to delete rental unit" };
   }
-}
+} */
 
 // Get units for a property
 export async function getUnitsForProperty(propertyId) {

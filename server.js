@@ -12,6 +12,22 @@ const DIST_DIR = path.join(__dirname, "dist");
 
 app.use(express.json());
 
+// Security headers middleware
+app.use((req, res, next) => {
+  // Content Security Policy
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; connect-src 'self' https://cloud.appwrite.io https://o4508853087371264.ingest.us.sentry.io https://accounts.google.com https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://accounts.google.com; img-src 'self' data: https: blob:; font-src 'self' data: https: fonts.gstatic.com; worker-src 'self' blob:;"
+  );
+  // X-Frame-Options
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  // X-Content-Type-Options
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  // Permissions-Policy
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  next();
+});
+
 // Helper to read feedbacks from file
 function readFeedbacks() {
   try {

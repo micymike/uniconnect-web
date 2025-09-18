@@ -15,6 +15,8 @@ import CreateProperty from "./pages/CreateProperty"
 import StudentMarketplace from "./pages/StudentMarketplace"
 import MarketplaceDashboard from "./pages/MarketplaceDashboard"
 import MealSharing from "./pages/MealSharing"
+import { isPushSubscribed, subscribeUserToPush } from "./api/pushNotifications";
+
 
 
 // Floating particles component
