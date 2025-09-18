@@ -595,21 +595,15 @@ export default function About() {
               },
               {
                 name: "Kennedy",
-                role: "Head of Marketing",
+                role: "Human resource",
                 bio: "Business graduate with extensive experience in campus organizations and student welfare initiatives.",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
-              {
-                name: "Sumare",
-                role: "Head of Marketting",
-                bio: "Marketing guru with a knack for building communities and driving engagement through innovative strategies.",
-                skills: ["Marketing", "Community", "Business Strategy"],
-                social: { linkedin: "#", twitter: "#", github: "#" }
-              },
+            
               {
                 name: "Rover Justus ",
-                role: "The Campus Deal Maker 🤝",
+                role: "Head of Marketing",
                 bio: "At JKUAT, He is that one guy who always “knows a guy.” From helping you find a house, a buyer, a seller —or even anything on   campus l—he connects the dots. Trusted, smooth, and always plugged in. Your go-to for smart, stress-free deals. 💼🎯",
                 skills: ["Marketing", "Community", "Business Strategy"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
@@ -622,24 +616,24 @@ export default function About() {
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
               {
-                name: "Cyrose",
-                role: "Social media manager",
-                bio: "A tech enthusiast. With a knack for coding and sales, he brings a unique blend of technical and business acumen to the team.",
-                skills: ["Tech", "Coding", "Sales"],
+                name: "Ian",
+                role: "Delivery Guy & Marketer",
+                bio: "Ian is a visionary young entrepreneur who perfectly balances his journey as a student with his passion for business. Highly innovative and business-oriented, he is constantly seeking new opportunities to create impactful solutions and ventures. Driven by ambition and resilience, Ian thrives in overcoming challenges that come his way, turning obstacles into stepping stones for growth. His ability to blend academic knowledge with real-world business insight sets him apart as a future leader who is determined to leave a lasting mark in the world of entrepreneurship.",
+                skills: ["Delivery", "Marketing", "Entrepreneurship"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
               {
-                name: "Koome",
-                role: "Marketing lead",
-                bio: "A dedicated project manager and business graduate with a strong foundation in marketing, he excels in leading projects that enhance student engagement and support. Passionate about fostering a positive community.",
-                skills: ["Marketing", "Community", "Business Strategy"],
+                name: "Cacey",
+                role: "Marketing",
+                bio: "Cacey is passionate about marketing and brings fresh energy to the team.",
+                skills: ["Marketing", "Teamwork"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               },
               {
-                name: "Deborah",
-                role: "Marketer",
-                bio: "She is good in networking and sales. With a passion for connecting students and enhancing campus life.",
-                skills: ["Networking", "Sales", "Marketing"],
+                name: "Brian",
+                role: "Operations & Logistics",
+                bio: "Brian is a dedicated team player who ensures everything runs smoothly behind the scenes. His attention to detail and commitment to operational excellence make him an invaluable asset to the UniConnect team.",
+                skills: ["Logistics", "Operations", "Teamwork"],
                 social: { linkedin: "#", twitter: "#", github: "#" }
               }
             ].map((member, index) => (
@@ -661,7 +655,10 @@ export default function About() {
         "Wafula Sheila": "/images/sheila.jpeg",
         "Cyrose": "/images/Cyrose.jpeg",
         "Koome": "/images/koome.jpeg",
-        "Deborah": "/images/deborah.jpeg"
+        "Deborah": "/images/deborah.jpeg",
+        "Ian": "/images/ian.jpg",
+        "Cacey": "/images/cacey.jpg",
+        "Brian": "/images/brian.jpg"
       };
       const imgSrc = imageMap[member.name];
       if (imgSrc) {
@@ -881,19 +878,23 @@ export default function About() {
             inset 0 0 30px rgba(255, 255, 255, 0.1);
         }
         
-        .interactive-3d-card {
+.interactive-3d-card {
           perspective: 1000px;
-          height: 400px;
+          min-height: 400px;
+          height: auto;
           cursor: pointer;
+          overflow: visible;
+          transform-style: preserve-3d;
         }
         
-        .card-inner {
+.card-inner {
           position: relative;
           width: 100%;
           height: 100%;
           text-align: center;
           transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           transform-style: preserve-3d;
+          will-change: transform;
         }
         
         .interactive-3d-card.flipped .card-inner {
@@ -903,7 +904,9 @@ export default function About() {
         .card-front, .card-back {
           position: absolute;
           width: 100%;
-          height: 100%;
+          min-height: 100%;
+          max-height: 100%;
+          overflow-y: auto;
           backface-visibility: hidden;
           border-radius: 20px;
           padding: 30px;
@@ -912,7 +915,7 @@ export default function About() {
           border: 1px solid rgba(255, 107, 53, 0.3);
           display: flex;
           flex-direction: column;
-          justify-content: center;
+          justify-content: flex-start;
           align-items: center;
         }
         

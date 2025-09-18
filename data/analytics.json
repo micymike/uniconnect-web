@@ -1,9 +1,9 @@
 {
-  "totalVisits": 280,
+  "totalVisits": 281,
   "uniqueVisitors": 1,
   "uniqueVisitorIps": "127.0.0.1",
   "pageViews": {
-    "/about": 1,
+    "/about": 2,
     "/hybridaction/zybTrackerStatisticsAction": 120,
     "/admin": 10,
     "/": 76,
