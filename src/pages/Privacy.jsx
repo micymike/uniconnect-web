@@ -149,8 +149,11 @@ export default function Privacy() {
                   2.2. <span className="font-semibold">User Content:</span> Information you provide when using our services, including meal listings, 
                   rental property details, marketplace listings, and communications with other users.
                 </p>
+                <p className="text-white mb-4">
+                  2.3. <span className="font-semibold">Meal Delivery Information:</span> When you use our meal delivery services, we collect information necessary to process your orders, such as your delivery address, order details, dietary preferences, and any special instructions. We may also collect information about your interactions with restaurants and delivery partners.
+                </p>
                 <p className="text-white">
-                  2.3. <span className="font-semibold">Usage Data:</span> Information about how you interact with our platform, including access times, 
+                  2.4. <span className="font-semibold">Usage Data:</span> Information about how you interact with our platform, including access times, 
                   pages viewed, and features used.
                 </p>
               </div>
@@ -161,13 +164,16 @@ export default function Privacy() {
                   3.1. To provide and maintain our services, including processing transactions and facilitating communications between users.
                 </p>
                 <p className="text-white mb-4">
-                  3.2. To improve and personalize your experience on our platform through analysis of usage patterns and preferences.
+                  3.2. To process and deliver your meal orders, including sharing necessary information with restaurants and delivery partners to fulfill your requests.
                 </p>
                 <p className="text-white mb-4">
-                  3.3. To communicate with you about updates, promotions, and important information related to your account or our services.
+                  3.3. To improve and personalize your experience on our platform through analysis of usage patterns and preferences.
+                </p>
+                <p className="text-white mb-4">
+                  3.4. To communicate with you about updates, promotions, and important information related to your account or our services.
                 </p>
                 <p className="text-white">
-                  3.4. To ensure the security and integrity of our platform by detecting and preventing fraudulent activity.
+                  3.5. To ensure the security and integrity of our platform by detecting and preventing fraudulent activity.
                 </p>
               </div>
 
@@ -178,15 +184,18 @@ export default function Privacy() {
                   will be shared to facilitate these interactions.
                 </p>
                 <p className="text-white mb-4">
-                  4.2. <span className="font-semibold">Service Providers:</span> We may share information with third-party vendors who provide services 
+                  4.2. <span className="font-semibold">With Restaurants and Delivery Partners:</span> For meal delivery services, we share relevant information (such as your name, delivery address, order details, and contact information) with restaurants and delivery partners to fulfill your meal orders. These parties are only authorized to use your information for the purpose of fulfilling your order and are required to protect your data in accordance with applicable laws.
+                </p>
+                <p className="text-white mb-4">
+                  4.3. <span className="font-semibold">Service Providers:</span> We may share information with third-party vendors who provide services 
                   on our behalf, such as payment processing and data analysis.
                 </p>
                 <p className="text-white mb-4">
-                  4.3. <span className="font-semibold">Legal Requirements:</span> We may disclose your information if required by law or in response to 
+                  4.4. <span className="font-semibold">Legal Requirements:</span> We may disclose your information if required by law or in response to 
                   valid requests from public authorities.
                 </p>
                 <p className="text-white">
-                  4.4. <span className="font-semibold">Business Transfers:</span> In the event of a merger, acquisition, or sale of assets, your information 
+                  4.5. <span className="font-semibold">Business Transfers:</span> In the event of a merger, acquisition, or sale of assets, your information 
                   may be transferred as part of the transaction.
                 </p>
               </div>
@@ -248,14 +257,15 @@ export default function Privacy() {
                   If you have any questions about this Privacy Policy, please contact us at privacy@uniconnect.com.
                 </p>
               </div>
-            </div>
 
-            <div className="mt-10 pt-8 border-t border-accent/20 text-center">
-              <p className="text-white">
+              <div>
+                <h2 className="text-2xl font-bold mb-4 text-accent">11. Meal Delivery from Restaurants</h2>
+                <p className="text-white mb-4">
                 Last updated: {new Date().toLocaleDateString()}
               </p>
             </div>
           </div>
+        </div>
         </div>
       </section>
       <Footer />
