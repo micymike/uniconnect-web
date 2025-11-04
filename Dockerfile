@@ -7,6 +7,10 @@ RUN npm ci --only=production
 
 COPY . .
 
+RUN npm i @vitejs/plugin-react
+
+RUN npm i 
+
 RUN npm install -g serve
 
 RUN npm run build
