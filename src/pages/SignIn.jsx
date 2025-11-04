@@ -34,6 +34,7 @@ export default function SignIn() {
       setEmailError("Email is required");
       hasError = true;
     }
+    
     if (!password || password.length < 8) {
       setPasswordError("Password must be at least 8 characters long");
       hasError = true;
